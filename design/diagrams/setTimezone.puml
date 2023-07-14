@@ -1,0 +1,18 @@
+@startuml
+hide footbox
+
+title Set timezone
+
+actor User as user
+participant Bot as bot
+database DB as db
+
+activate user
+activate bot
+user -> bot: /timezone - number
+activate db
+bot -> db
+db --> bot
+bot --> user: timezone is successfully set
+deactivate db
+@enduml

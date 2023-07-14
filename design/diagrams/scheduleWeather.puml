@@ -1,0 +1,18 @@
+@startuml
+hide footbox
+
+title Schedule issuing the weather
+
+participant RabbitMQ as rabbit
+participant Scheduler as scheduler
+database DB as db
+
+activate rabbit
+activate scheduler
+activate db
+scheduler -> db: every 1 minute
+db --> scheduler
+scheduler -> rabbit: if weather is scheduled, \nit will send info about subscription
+deactivate db
+
+@enduml
