@@ -1,0 +1,24 @@
+@startuml
+hide footbox
+
+title Send the weather
+
+actor User as user
+participant Bot as bot
+participant RabbitMQ as rabbit
+participant "Weather API" as api
+
+activate bot
+activate rabbit
+rabbit -> bot: subscribe for subscription
+
+|||
+
+activate api
+deactivate rabbit
+bot -> api: when subscription is received
+api --> bot
+bot --> user: send the weather
+deactivate api
+deactivate bot
+@enduml
