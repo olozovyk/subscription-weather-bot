@@ -8,7 +8,7 @@
 - **Users**:
   - userId: uuid
   - chatId: number, unique
-  - timezone: number
+  - timezone: string
 
 
 - **Subscriptions**:

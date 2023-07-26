@@ -1,15 +1,31 @@
 import { Ctx, Hears, Help, InjectBot, Start, Update } from 'nestjs-telegraf';
-import { Context, Markup, Scenes, Telegraf } from 'telegraf';
+import { Telegraf } from 'telegraf';
 import { IMyContext } from './types/myContext.interface';
 import { showMainKeyboard } from './keyboards/main.keyboard';
+import { BotRepository } from './bot.repository';
 
 @Update()
 export class BotUpdate {
-  constructor(@InjectBot() private bot: Telegraf) {}
+  constructor(
+    @InjectBot() private bot: Telegraf,
+    private botRepository: BotRepository,
+  ) {}
 
   // TODO: add to DB basic user info
   @Start()
   async start(@Ctx() ctx: IMyContext) {
+    if (!ctx.chat) {
+      return;
+    }
+
+    const chatId = ctx.chat.id;
+
+    const existingUser = await this.botRepository.getUserByChatId(chatId);
+
+    if (!existingUser) {
+      await this.botRepository.saveUser({ chatId });
+    }
+
     await this.setMenu();
     await ctx.reply(
       'In this bot you can create a subscription to get the weather forecast in the time you want',
@@ -35,40 +51,4 @@ export class BotUpdate {
       { command: 'timezone', description: 'Set timezone' },
     ]);
   }
-  // @Command('new')
-  // async createSubscription(@Ctx() ctx: Context, @Message('text') text: string) {
-  //   const arrayFromString = parseCreateSubscriptionString(text);
-  //
-  //   if (arrayFromString.length < 3) {
-  //     await ctx.reply('Enter complete information. See /help');
-  //     return;
-  //   }
-  //
-  //   const [name, time, location] = arrayFromString;
-  //
-  //   interface ISubscriptionInfo {
-  //     time: string;
-  //     name: string;
-  //     location: string;
-  //     coordinates: string;
-  //   }
-  //
-  //   const subscriptionInfo: Partial<ISubscriptionInfo> = {
-  //     name,
-  //   };
-  //
-  //   if (!validateTime(time)) {
-  //     await ctx.reply('Enter time with correct format');
-  //     return;
-  //   }
-  //
-  //   subscriptionInfo.time = time;
-  //
-  //   const geocodingUrl = this.configService.getOrThrow('GEOCODING_API_URL');
-  //   const openWeatherApiKey = this.configService.getOrThrow(
-  //     'OPEN_WEATHER_API_KEY',
-  //   );
-  //   const url = `${geocodingUrl}q=${location}&appid=${openWeatherApiKey}`;
-  //   const locations = await this.httpService.get(url);
-  // }
 }

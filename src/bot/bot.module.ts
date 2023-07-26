@@ -9,6 +9,7 @@ import { AskLocationScene } from './scenes/createSubscription/askLocation.scene'
 import { HttpService } from '../http/http.service';
 import { SaveLocationScene } from './scenes/createSubscription/saveLocation.scene';
 import { TimeScene } from './scenes/createSubscription/time.scene';
+import { BotRepository } from './bot.repository';
 
 const sessions = new LocalSession({ database: 'sessions.json' });
 
@@ -28,6 +29,7 @@ const sessions = new LocalSession({ database: 'sessions.json' });
   providers: [
     BotUpdate,
     HttpService,
+    BotRepository,
     SubscriptionNameScene,
     AskLocationScene,
     SaveLocationScene,
