@@ -8,5 +8,6 @@ export interface IMyContext extends Context {
     name: string;
     locations: ILocation[];
     location: ILocation;
+    time: string;
   };
 }

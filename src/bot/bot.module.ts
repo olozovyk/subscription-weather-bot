@@ -8,6 +8,7 @@ import * as LocalSession from 'telegraf-session-local';
 import { AskLocationScene } from './scenes/createSubscription/askLocation.scene';
 import { HttpService } from '../http/http.service';
 import { SaveLocationScene } from './scenes/createSubscription/saveLocation.scene';
+import { TimeScene } from './scenes/createSubscription/time.scene';
 
 const sessions = new LocalSession({ database: 'sessions.json' });
 
@@ -30,6 +31,7 @@ const sessions = new LocalSession({ database: 'sessions.json' });
     SubscriptionNameScene,
     AskLocationScene,
     SaveLocationScene,
+    TimeScene,
   ],
 })
 export class BotModule {}

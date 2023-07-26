@@ -46,11 +46,7 @@ export class SaveLocationScene {
       lon: location.lon,
     } as ILocation;
 
-    await ctx.reply(
-      JSON.stringify(ctx.session.newUser.location),
-      showMainKeyboard(),
-    );
-    ctx.scene.leave();
+    ctx.scene.enter('timeScene');
   }
 
   @On('audio')
