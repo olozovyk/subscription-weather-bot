@@ -1,12 +1,46 @@
 import { Ctx, Message, On, Scene, SceneEnter } from 'nestjs-telegraf';
 import { IMyContext } from '../../types/myContext.interface';
 import { showCancelSceneKeyboard } from '../../keyboards/cancelScene.keyboard';
-import { cancelScene } from '../../utils/cancelScene';
+import { cancelScene, exitScene } from '../../utils/cancelScene';
+import { BotRepository } from '../../bot.repository';
+import { BaseScene } from '../base.scene';
+import { Subscription } from '../../../entities/subscription.entity';
+import { showMainKeyboard } from '../../keyboards/main.keyboard';
 
 @Scene('subscriptionName')
-export class SubscriptionNameScene {
+export class SubscriptionNameScene extends BaseScene {
+  constructor(private botRepository: BotRepository) {
+    super();
+  }
+
   @SceneEnter()
   async enter(@Ctx() ctx: IMyContext) {
+    if (!ctx.chat) {
+      exitScene(ctx);
+      return;
+    }
+
+    const chatId = ctx.chat.id;
+    const user = await this.botRepository.getUserByChatId(chatId);
+
+    if (!user) {
+      await ctx.reply('User is not found');
+      exitScene(ctx);
+      return;
+    }
+
+    const subscriptions = await this.botRepository.getAllSubscriptions(user);
+    ctx.session.subscriptions = subscriptions;
+
+    if (subscriptions.length >= 5) {
+      await ctx.reply(
+        'You can add no more than 5 subscriptions.',
+        showMainKeyboard(),
+      );
+      exitScene(ctx);
+      return;
+    }
+
     await ctx.reply(
       'What name would you like to give to your new subscription?',
       showCancelSceneKeyboard(),
@@ -20,21 +54,22 @@ export class SubscriptionNameScene {
       return;
     }
 
-    // TODO: check for uniqueness
+    const isNameExist = ctx.session.subscriptions.some(
+      (subscription: Subscription) => subscription.name === text,
+    );
 
-    ctx.session.newUser = {
-      name: text,
+    if (isNameExist) {
+      await ctx.reply(
+        'You already have a subscription with such a name. Please give an another name',
+        showCancelSceneKeyboard(),
+      );
+      return;
+    }
+
+    ctx.session.newSubscription = {
+      name: text.trim(),
     };
 
     ctx.scene.enter('askLocation');
-  }
-
-  @On('audio')
-  @On('voice')
-  @On('video')
-  @On('photo')
-  @On('document')
-  repeatQuestion(@Ctx() ctx: IMyContext) {
-    ctx.scene.reenter();
   }
 }

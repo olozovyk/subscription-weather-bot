@@ -11,7 +11,6 @@ export class BotUpdate {
     private botRepository: BotRepository,
   ) {}
 
-  // TODO: add to DB basic user info
   @Start()
   async start(@Ctx() ctx: IMyContext) {
     if (!ctx.chat) {

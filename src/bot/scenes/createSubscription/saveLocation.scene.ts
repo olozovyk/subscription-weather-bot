@@ -1,15 +1,15 @@
 import { Ctx, Message, On, Scene, SceneEnter } from 'nestjs-telegraf';
 import { IMyContext } from '../../types/myContext.interface';
 import { cancelScene } from '../../utils/cancelScene';
-import { showMainKeyboard } from '../../keyboards/main.keyboard';
 import { showPickLocationKeyboard } from '../../keyboards/pickLocation.keyboard';
 import { ILocation } from '../../types/location.interface';
+import { BaseScene } from '../base.scene';
 
 @Scene('saveLocation')
-export class SaveLocationScene {
+export class SaveLocationScene extends BaseScene {
   @SceneEnter()
   async enter(@Ctx() ctx: IMyContext) {
-    const locations = ctx.session.newUser.locations;
+    const locations = ctx.session.locations;
 
     const locationsStr = locations
       .map((location: ILocation, idx: number) => {
@@ -37,8 +37,16 @@ export class SaveLocationScene {
       return;
     }
 
-    const location = ctx.session.newUser.locations[Number(text) - 1];
-    ctx.session.newUser.location = {
+    if (
+      isNaN(Number(text)) ||
+      Number(text) > ctx.session.locations.length ||
+      Number(text) < 1
+    ) {
+      return ctx.scene.reenter();
+    }
+
+    const location = ctx.session.locations[Number(text) - 1];
+    ctx.session.newSubscription.location = {
       name: location.name,
       country: location.country,
       state: location.state,
@@ -47,14 +55,5 @@ export class SaveLocationScene {
     } as ILocation;
 
     ctx.scene.enter('timeScene');
-  }
-
-  @On('audio')
-  @On('voice')
-  @On('video')
-  @On('photo')
-  @On('document')
-  repeatQuestion(@Ctx() ctx: IMyContext) {
-    ctx.scene.reenter();
   }
 }

@@ -5,18 +5,21 @@ import { cancelScene } from '../../utils/cancelScene';
 import { HttpService } from '../../../http/http.service';
 import { ConfigService } from '@nestjs/config';
 import { ILocation } from '../../types/location.interface';
+import { BaseScene } from '../base.scene';
 
 @Scene('askLocation')
-export class AskLocationScene {
+export class AskLocationScene extends BaseScene {
   constructor(
     private httpService: HttpService,
     private configService: ConfigService,
-  ) {}
+  ) {
+    super();
+  }
 
   @SceneEnter()
   async enter(@Ctx() ctx: IMyContext) {
     await ctx.reply(
-      'Could you tell the location you want the weather for?',
+      'Please tell the location you want the weather for?',
       showCancelSceneKeyboard(),
     );
   }
@@ -43,17 +46,8 @@ export class AskLocationScene {
       return;
     }
 
-    ctx.session.newUser.locations = locations;
+    ctx.session.locations = locations;
 
     ctx.scene.enter('saveLocation');
-  }
-
-  @On('audio')
-  @On('voice')
-  @On('video')
-  @On('photo')
-  @On('document')
-  repeatQuestion(@Ctx() ctx: IMyContext) {
-    ctx.scene.reenter();
   }
 }

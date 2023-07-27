@@ -1,18 +1,25 @@
 import { zonedTimeToUtc } from 'date-fns-tz';
 
-export const convertStringToDate = (time: string, timezone?: string) => {
+export const convertStringToDate = (
+  time: string,
+  timezone?: string,
+): { timeLocal: Date; timeUTC: Date } => {
   const arr = time.split(':');
   const hours = parseInt(arr[0]);
   const minutes = parseInt(arr[1]);
 
-  let date = new Date();
+  const timeLocal = new Date();
+  let timeUTC = timeLocal;
 
-  date.setHours(hours);
-  date.setMinutes(minutes);
+  timeLocal.setHours(hours);
+  timeLocal.setMinutes(minutes);
 
   if (timezone) {
-    date = zonedTimeToUtc(date, timezone);
+    timeUTC = zonedTimeToUtc(timeLocal, timezone);
   }
 
-  return date;
+  return {
+    timeLocal,
+    timeUTC,
+  };
 };

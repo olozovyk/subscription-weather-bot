@@ -1,13 +1,19 @@
 import { Context } from 'telegraf';
 import { ILocation } from './location.interface';
+import { Subscription } from '../../entities/subscription.entity';
 
-export interface IMyContext extends Context {
-  session: any;
-  scene: any;
+type MySession = any & {
+  locations: ILocation[];
+  timeLocal: Date;
   newSubscription: {
     name: string;
-    locations: ILocation[];
     location: ILocation;
-    time: string;
+    time: Date;
   };
+  subscriptions: Subscription[];
+};
+
+export interface IMyContext extends Context {
+  session: MySession;
+  scene: any;
 }

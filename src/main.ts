@@ -1,10 +1,13 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as process from 'process';
+import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
   process.env.TZ = 'UTC';
   const app = await NestFactory.create(AppModule);
-  await app.listen(3000);
+  const configService = app.get(ConfigService);
+  const PORT = configService.getOrThrow('PORT');
+  await app.listen(PORT);
 }
 bootstrap();
