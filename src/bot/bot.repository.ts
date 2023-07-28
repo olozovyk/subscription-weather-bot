@@ -25,7 +25,7 @@ export class BotRepository {
   public getAllSubscriptions(user: User) {
     return this.subscriptionRepository.find({
       where: { user },
-      relations: { location: true },
+      relations: { location: true, user: true },
     });
   }
 

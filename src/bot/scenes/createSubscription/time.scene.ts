@@ -3,7 +3,7 @@ import { IMyContext } from '../../types/myContext.interface';
 import { showCancelSceneKeyboard } from '../../keyboards/cancelScene.keyboard';
 import { cancelScene, exitScene } from '../../utils/cancelScene';
 import { validateTime } from '../../../common/utils';
-import { convertStringToDate } from '../../../common/utils/convertStringToDate';
+import { convertInputStringToDate } from '../../../common/utils/convertInputStringToDate';
 import { showMainKeyboard } from '../../keyboards/main.keyboard';
 import { Subscription } from '../../../entities/subscription.entity';
 import { Location } from '../../../entities/location.entity';
@@ -40,12 +40,6 @@ export class TimeScene extends BaseScene {
       return;
     }
 
-    // TODO: get TZ
-
-    const { timeLocal, timeUTC } = convertStringToDate(text);
-    ctx.session.timeLocal = timeLocal;
-    ctx.session.newSubscription.time = timeUTC;
-
     if (!ctx.chat) {
       return;
     }
@@ -55,6 +49,13 @@ export class TimeScene extends BaseScene {
     if (!user) {
       return;
     }
+
+    const { timeLocal, timeUTC } = convertInputStringToDate(
+      text,
+      user.timezone,
+    );
+
+    ctx.session.newSubscription.time = timeUTC;
 
     const location = new Location();
     location.name = ctx.session.newSubscription.location.name;

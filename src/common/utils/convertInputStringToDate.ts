@@ -1,6 +1,6 @@
 import { zonedTimeToUtc } from 'date-fns-tz';
 
-export const convertStringToDate = (
+export const convertInputStringToDate = (
   time: string,
   timezone?: string,
 ): { timeLocal: Date; timeUTC: Date } => {

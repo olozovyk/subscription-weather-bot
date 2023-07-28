@@ -3,6 +3,8 @@ import { Telegraf } from 'telegraf';
 import { IMyContext } from './types/myContext.interface';
 import { showMainKeyboard } from './keyboards/main.keyboard';
 import { BotRepository } from './bot.repository';
+import { Logger } from '@nestjs/common';
+import { convertDateToInputString } from '../common/utils/convertDateToInputString';
 
 @Update()
 export class BotUpdate {
@@ -10,6 +12,8 @@ export class BotUpdate {
     @InjectBot() private bot: Telegraf,
     private botRepository: BotRepository,
   ) {}
+
+  private logger = new Logger(BotUpdate.name);
 
   @Start()
   async start(@Ctx() ctx: IMyContext) {
@@ -46,6 +50,51 @@ export class BotUpdate {
   @Hears('Set timezone')
   async setTimezone(@Ctx() ctx: IMyContext) {
     await ctx.scene.enter('timezoneScene');
+  }
+
+  @Hears('All subscriptions')
+  async showSubscriptions(@Ctx() ctx: IMyContext) {
+    if (!ctx.chat) return;
+
+    const user = await this.botRepository.getUserByChatId(ctx.chat.id);
+
+    if (!user) {
+      this.logger.error('User is not found');
+      return;
+    }
+
+    const subscriptions = await this.botRepository.getAllSubscriptions(user);
+
+    if (!subscriptions.length) {
+      return ctx.reply(
+        `You don't have active subscriptions`,
+        showMainKeyboard(),
+      );
+    }
+
+    let subscriptionMessage = 'You have next subscriptions:' + '\n\n';
+
+    subscriptions.map(async (subscription, idx) => {
+      const {
+        name,
+        time,
+        location: { name: locationName, country, state },
+      } = subscription;
+
+      const timeToShow = convertDateToInputString(time, user.timezone);
+
+      subscriptionMessage += `Name: ${name} \nTime: ${timeToShow} \nLocation: ${locationName}, ${country}`;
+
+      if (state) {
+        subscriptionMessage += ` ${state}`;
+      }
+
+      if (idx !== subscriptions.length - 1) {
+        subscriptionMessage += '\n\n';
+      }
+    });
+
+    await ctx.reply(subscriptionMessage, showMainKeyboard());
   }
 
   // TODO: is it necessary?

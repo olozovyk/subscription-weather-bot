@@ -4,7 +4,6 @@ import { Subscription } from '../../entities/subscription.entity';
 
 type MySession = any & {
   locations: ILocation[];
-  timeLocal: Date;
   newSubscription: {
     name: string;
     location: ILocation;
