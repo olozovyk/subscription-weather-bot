@@ -28,4 +28,8 @@ export class BotRepository {
       relations: { location: true },
     });
   }
+
+  public setTimezone(chatId: number, timezone: string) {
+    return this.userRepository.update({ chatId }, { timezone });
+  }
 }

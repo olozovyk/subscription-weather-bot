@@ -43,11 +43,15 @@ export class BotUpdate {
     await ctx.scene.enter('subscriptionName');
   }
 
+  @Hears('Set timezone')
+  async setTimezone(@Ctx() ctx: IMyContext) {
+    await ctx.scene.enter('timezoneScene');
+  }
+
   // TODO: is it necessary?
   private async setMenu() {
     await this.bot.telegram.setMyCommands([
       { command: 'help', description: 'Get help' },
-      { command: 'timezone', description: 'Set timezone' },
     ]);
   }
 }
