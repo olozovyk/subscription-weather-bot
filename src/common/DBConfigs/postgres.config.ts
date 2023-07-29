@@ -1,10 +1,10 @@
-import * as dotenv from 'dotenv';
 import { ConfigService } from '@nestjs/config';
 import { DataSourceOptions } from 'typeorm';
-
-const configService = new ConfigService();
+import * as dotenv from 'dotenv';
 
 dotenv.config();
+
+const configService = new ConfigService();
 
 export const postgresConfig: DataSourceOptions = {
   type: 'postgres',

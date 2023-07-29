@@ -13,6 +13,8 @@ import { showMainKeyboard } from './keyboards/main.keyboard';
 import { BotRepository } from './bot.repository';
 import { Logger } from '@nestjs/common';
 import { convertDateToInputString } from '../common/utils/convertDateToInputString';
+import { Subscription } from '../entities/subscription.entity';
+import { User } from '../entities/user.entity';
 
 @Update()
 export class BotUpdate {
@@ -25,29 +27,13 @@ export class BotUpdate {
 
   @Start()
   async start(@Ctx() ctx: IMyContext) {
-    if (!ctx.chat) {
-      return;
-    }
-
-    const chatId = ctx.chat.id;
-
-    const existingUser = await this.botRepository.getUserByChatId(chatId);
-
-    if (!existingUser) {
-      await this.botRepository.saveUser({ chatId });
-    }
-
-    await this.setMenu();
-    await ctx.reply(
-      'In this bot you can create a subscription to get the weather forecast in the time you want',
-      showMainKeyboard(),
-    );
+    await this.startHandler(ctx);
   }
 
-  // TODO:
   @Help()
+  @Hears('Help')
   async help(@Ctx() ctx: IMyContext) {
-    await ctx.reply('Before you create your new subscription...');
+    await this.helpHandler(ctx);
   }
 
   @Hears('New subscription')
@@ -62,25 +48,91 @@ export class BotUpdate {
 
   @Hears('All subscriptions')
   async showSubscriptions(@Ctx() ctx: IMyContext) {
-    if (!ctx.chat) return;
+    await this.getSubscriptionsHandler(ctx);
+  }
 
-    const user = await this.botRepository.getUserByChatId(ctx.chat.id);
+  @Hears('Delete subscription')
+  async deleteSubscription(@Ctx() ctx: IMyContext) {
+    await ctx.scene.enter('deleteSubscriptionScene');
+  }
 
-    if (!user) {
-      this.logger.error('User is not found');
+  @On('audio')
+  @On('voice')
+  @On('video')
+  @On('photo')
+  @On('document')
+  @On('sticker')
+  @On('text')
+  async answerDefault(@Ctx() ctx: IMyContext) {
+    await ctx.reply('Please make your choice', showMainKeyboard());
+  }
+
+  private async setMenu() {
+    await this.bot.telegram.setMyCommands([
+      { command: 'start', description: 'Start the bot' },
+      { command: 'help', description: 'Get help' },
+    ]);
+  }
+
+  private async startHandler(ctx: IMyContext) {
+    if (!ctx.chat) {
       return;
     }
+    const chatId = ctx.chat.id;
 
-    const subscriptions = await this.botRepository.getAllSubscriptions(user);
+    try {
+      const existingUser = await this.botRepository.getUserByChatId(chatId);
 
-    if (!subscriptions.length) {
+      if (!existingUser) {
+        await this.botRepository.saveUser({ chatId });
+      }
+
+      await this.setMenu();
       await ctx.reply(
-        `You don't have active subscriptions`,
+        'In this bot you can create a subscription to get the weather forecast in the time you want',
         showMainKeyboard(),
       );
-      return;
+    } catch (e) {
+      await ctx.reply(e.message);
     }
+  }
 
+  private async getSubscriptionsHandler(ctx: IMyContext) {
+    try {
+      if (!ctx.chat) return;
+
+      const user = await this.botRepository.getUserByChatId(ctx.chat.id);
+
+      if (!user) {
+        this.logger.error('User is not found');
+        return;
+      }
+
+      const subscriptions = await this.botRepository.getAllSubscriptions(user);
+
+      if (!subscriptions.length) {
+        await ctx.reply(
+          `You don't have active subscriptions`,
+          showMainKeyboard(),
+        );
+        return;
+      }
+
+      const subscriptionsMessage = this.getSubscriptionsMessage(
+        subscriptions,
+        user,
+      );
+
+      await ctx.reply(subscriptionsMessage, showMainKeyboard());
+    } catch (e) {
+      await ctx.reply(e.message);
+    }
+  }
+
+  private getSubscriptionsMessage(
+    subscriptions: Subscription[],
+    user: User,
+  ): string {
     let subscriptionMessage = 'You have next subscriptions:' + '\n\n';
 
     subscriptions.map(async (subscription, idx) => {
@@ -103,29 +155,18 @@ export class BotUpdate {
       }
     });
 
-    await ctx.reply(subscriptionMessage, showMainKeyboard());
+    return subscriptionMessage;
   }
 
-  @Hears('Delete subscription')
-  async deleteSubscription(@Ctx() ctx: IMyContext) {
-    await ctx.scene.enter('deleteSubscriptionScene');
-  }
-
-  @On('audio')
-  @On('voice')
-  @On('video')
-  @On('photo')
-  @On('document')
-  @On('sticker')
-  @On('text')
-  async answerDefault(@Ctx() ctx: IMyContext) {
-    await ctx.reply('Please make your choice', showMainKeyboard());
-  }
-
-  // TODO: is it necessary?
-  private async setMenu() {
-    await this.bot.telegram.setMyCommands([
-      { command: 'help', description: 'Get help' },
-    ]);
+  private async helpHandler(ctx: IMyContext) {
+    await ctx.reply(
+      'In this bot you can create subscriptions to receive the weather forecast at the time you want.\n' +
+        '\n' +
+        'To create a subscription press the button "New subscription" and follow the instructions.\n' +
+        '\n' +
+        'By default the bot saves a time in the UTC format. To save a time in your timezone you should set a timezone by pressing the button “Set timezone”.\n' +
+        '\n' +
+        'You can create up to 5 subscriptions.',
+    );
   }
 }

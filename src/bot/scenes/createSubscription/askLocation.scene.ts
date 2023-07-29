@@ -1,11 +1,11 @@
 import { Ctx, Message, On, Scene, SceneEnter } from 'nestjs-telegraf';
-import { IMyContext } from '../../types/myContext.interface';
-import { showCancelSceneKeyboard } from '../../keyboards/cancelScene.keyboard';
-import { cancelScene } from '../../utils/cancelScene';
-import { HttpService } from '../../../http/http.service';
 import { ConfigService } from '@nestjs/config';
-import { ILocation } from '../../types/location.interface';
+
 import { BaseScene } from '../base.scene';
+import { HttpService } from '../../../http/http.service';
+import { showCancelSceneKeyboard } from '../../keyboards';
+import { cancelScene, normalizeQueryLocationString } from '../../utils';
+import { ILocation, IMyContext } from '../../types';
 
 @Scene('askLocation')
 export class AskLocationScene extends BaseScene {
@@ -34,8 +34,9 @@ export class AskLocationScene extends BaseScene {
     const geoUrl = this.configService.getOrThrow('GEOCODING_API_URL');
     const apiKey = this.configService.getOrThrow('OPEN_WEATHER_API_KEY');
 
-    // TODO: normalize query string ie new+york
-    const url = geoUrl + `q=${text}&limit=${5}&appid=${apiKey}`;
+    const locationQuery = normalizeQueryLocationString(text);
+
+    const url = geoUrl + `q=${locationQuery}&limit=${5}&appid=${apiKey}`;
     const locations = await this.httpService.get<ILocation[]>(url);
 
     if (!locations || !locations.length) {

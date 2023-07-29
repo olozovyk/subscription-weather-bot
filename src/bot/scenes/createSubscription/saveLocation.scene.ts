@@ -1,9 +1,9 @@
 import { Ctx, Message, On, Scene, SceneEnter } from 'nestjs-telegraf';
-import { IMyContext } from '../../types/myContext.interface';
-import { cancelScene } from '../../utils/cancelScene';
-import { showPickLocationKeyboard } from '../../keyboards/pickLocation.keyboard';
-import { ILocation } from '../../types/location.interface';
+
 import { BaseScene } from '../base.scene';
+import { cancelScene } from '../../utils';
+import { showPickLocationKeyboard } from '../../keyboards';
+import { ILocation, IMyContext } from '../../types';
 
 @Scene('saveLocation')
 export class SaveLocationScene extends BaseScene {
