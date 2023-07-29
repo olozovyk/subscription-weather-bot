@@ -1,4 +1,12 @@
-import { Ctx, Hears, Help, InjectBot, Start, Update } from 'nestjs-telegraf';
+import {
+  Ctx,
+  Hears,
+  Help,
+  InjectBot,
+  On,
+  Start,
+  Update,
+} from 'nestjs-telegraf';
 import { Telegraf } from 'telegraf';
 import { IMyContext } from './types/myContext.interface';
 import { showMainKeyboard } from './keyboards/main.keyboard';
@@ -66,10 +74,11 @@ export class BotUpdate {
     const subscriptions = await this.botRepository.getAllSubscriptions(user);
 
     if (!subscriptions.length) {
-      return ctx.reply(
+      await ctx.reply(
         `You don't have active subscriptions`,
         showMainKeyboard(),
       );
+      return;
     }
 
     let subscriptionMessage = 'You have next subscriptions:' + '\n\n';
@@ -95,6 +104,22 @@ export class BotUpdate {
     });
 
     await ctx.reply(subscriptionMessage, showMainKeyboard());
+  }
+
+  @Hears('Delete subscription')
+  async deleteSubscription(@Ctx() ctx: IMyContext) {
+    await ctx.scene.enter('deleteSubscriptionScene');
+  }
+
+  @On('audio')
+  @On('voice')
+  @On('video')
+  @On('photo')
+  @On('document')
+  @On('sticker')
+  @On('text')
+  async answerDefault(@Ctx() ctx: IMyContext) {
+    await ctx.reply('Please make your choice', showMainKeyboard());
   }
 
   // TODO: is it necessary?

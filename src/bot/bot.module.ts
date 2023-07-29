@@ -11,6 +11,7 @@ import { SaveLocationScene } from './scenes/createSubscription/saveLocation.scen
 import { TimeScene } from './scenes/createSubscription/time.scene';
 import { BotRepository } from './bot.repository';
 import { TimezoneScene } from './scenes/setTimezone/timezone.scene';
+import { DeleteSubscriptionScene } from './scenes/deleteSubscription/deleteSubscription.scene';
 
 const sessions = new LocalSession({ database: 'sessions.json' });
 
@@ -36,6 +37,7 @@ const sessions = new LocalSession({ database: 'sessions.json' });
     SaveLocationScene,
     TimeScene,
     TimezoneScene,
+    DeleteSubscriptionScene,
   ],
 })
 export class BotModule {}

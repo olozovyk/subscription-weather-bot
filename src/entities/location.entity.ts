@@ -1,4 +1,10 @@
-import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Subscription } from './subscription.entity';
 
 @Entity('locations')
@@ -21,6 +27,9 @@ export class Location {
   @Column({ type: 'numeric' })
   longitude: number;
 
-  @OneToOne(() => Subscription)
+  @OneToOne(() => Subscription, subscription => subscription.location, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn()
   subscription: Subscription;
 }

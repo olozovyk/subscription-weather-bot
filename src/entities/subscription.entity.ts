@@ -1,7 +1,6 @@
 import {
   Column,
   Entity,
-  JoinColumn,
   ManyToOne,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -23,10 +22,9 @@ export class Subscription {
   @ManyToOne(() => User)
   user: User;
 
-  @OneToOne(() => Location, {
+  @OneToOne(() => Location, location => location.subscription, {
     cascade: true,
     nullable: false,
   })
-  @JoinColumn()
   location: Location;
 }

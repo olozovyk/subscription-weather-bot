@@ -32,4 +32,19 @@ export class BotRepository {
   public setTimezone(chatId: number, timezone: string) {
     return this.userRepository.update({ chatId }, { timezone });
   }
+
+  public getSubscriptionByName(subscriptionName: string) {
+    return this.subscriptionRepository.findOne({
+      where: {
+        name: subscriptionName,
+      },
+      relations: {
+        location: true,
+      },
+    });
+  }
+
+  public deleteSubscription(subscription: Subscription) {
+    return this.subscriptionRepository.remove(subscription);
+  }
 }

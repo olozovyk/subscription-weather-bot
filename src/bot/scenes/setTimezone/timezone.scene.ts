@@ -46,6 +46,6 @@ export class TimezoneScene extends BaseScene {
     await this.botRepository.setTimezone(chatId, text);
     await ctx.reply(`Timezone ${text} was saved`, showMainKeyboard());
 
-    ctx.scene.leave();
+    exitScene(ctx);
   }
 }

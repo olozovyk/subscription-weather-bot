@@ -83,6 +83,5 @@ export class TimeScene extends BaseScene {
     );
 
     exitScene(ctx);
-    ctx.scene.leave();
   }
 }
