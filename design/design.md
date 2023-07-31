@@ -5,19 +5,27 @@
 
 ### DB schemas:
 
-- **Users**:
-  - userId: uuid
+- **Users:**
+  - id: uuid
   - chatId: number, unique
-  - timezone: number
+  - timezone: string
 
 
-- **Subscriptions**:
-  - subscriptionId: uuid
-  - userId: uuid
+- **Subscriptions:**
+  - id: uuid
   - subscriptionName: string
   - time: TIME, unique, index
-  - location: string
-  - coordinates: string
+  - userId: uuid
+
+
+- **Locations:**
+  - id: uuid
+  - name: string
+  - country: string
+  - state: string
+  - latitude: number
+  - longitude: number
+  - subscriptionId: uuid
 
 
 ### Used tools and packages:
@@ -27,3 +35,6 @@
 creating bots and integration with NestJS application
 - [TypeORM](https://www.npmjs.com/package/typeorm) - an Object-Relational Mapping (ORM) library for TypeScript and JavaScript
 - [cron](https://www.npmjs.com/package/cron) - a tool allows to execute something on a schedule
+- [axios](https://www.npmjs.com/package/axios) - HTTP client for the browser and node.js
+- [date-fns](https://www.npmjs.com/package/date-fns), [date-fns-tz](https://www.npmjs.com/package/date-fns-tz) - a toolset for manipulating JavaScript dates in a browser & Node.js
+- [timezone-support](https://www.npmjs.com/package/timezone-support) - time zone listing and date converting
