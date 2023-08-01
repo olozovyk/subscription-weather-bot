@@ -15,15 +15,16 @@ import { Logger } from '@nestjs/common';
 import { convertDateToInputString } from '../common/utils/convertDateToInputString';
 import { Subscription } from '../entities/subscription.entity';
 import { User } from '../entities/user.entity';
+import { getChatId } from './utils/getChatId';
 
 @Update()
-export class BotUpdate {
+export class BotService {
   constructor(
     @InjectBot() private bot: Telegraf,
     private botRepository: BotRepository,
   ) {}
 
-  private logger = new Logger(BotUpdate.name);
+  private logger = new Logger(BotService.name);
 
   @Start()
   async start(@Ctx() ctx: IMyContext) {
@@ -75,10 +76,8 @@ export class BotUpdate {
   }
 
   private async startHandler(ctx: IMyContext) {
-    if (!ctx.chat) {
-      return;
-    }
-    const chatId = ctx.chat.id;
+    const chatId = getChatId(ctx);
+    if (!chatId) return;
 
     try {
       const existingUser = await this.botRepository.getUserByChatId(chatId);
@@ -99,9 +98,10 @@ export class BotUpdate {
 
   private async getSubscriptionsHandler(ctx: IMyContext) {
     try {
-      if (!ctx.chat) return;
+      const chatId = getChatId(ctx);
+      if (!chatId) return;
 
-      const user = await this.botRepository.getUserByChatId(ctx.chat.id);
+      const user = await this.botRepository.getUserByChatId(chatId);
 
       if (!user) {
         this.logger.error('User is not found');

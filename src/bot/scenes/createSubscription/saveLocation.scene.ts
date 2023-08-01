@@ -1,7 +1,7 @@
 import { Ctx, Message, On, Scene, SceneEnter } from 'nestjs-telegraf';
 
 import { BaseScene } from '../base.scene';
-import { cancelScene } from '../../utils';
+import { isSceneCanceled } from '../../utils';
 import { showPickLocationKeyboard } from '../../keyboards';
 import { ILocation, IMyContext } from '../../types';
 
@@ -32,10 +32,7 @@ export class SaveLocationScene extends BaseScene {
 
   @On('text')
   async saveLocation(@Ctx() ctx: IMyContext, @Message('text') text: string) {
-    if (text === '❌ Cancel') {
-      await cancelScene(ctx, 'create');
-      return;
-    }
+    if (await isSceneCanceled(ctx, text, 'create')) return;
 
     if (
       isNaN(Number(text)) ||

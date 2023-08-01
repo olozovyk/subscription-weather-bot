@@ -3,7 +3,7 @@ import { Ctx, Message, On, Scene, SceneEnter } from 'nestjs-telegraf';
 import { BaseScene } from '../base.scene';
 import { BotRepository } from '../../bot.repository';
 import { showCancelSceneKeyboard, showMainKeyboard } from '../../keyboards';
-import { cancelScene, exitScene } from '../../utils';
+import { exitScene, isSceneCanceled } from '../../utils';
 import {
   convertInputStringToDate,
   getTimeToShow,
@@ -11,6 +11,7 @@ import {
 } from '../../../common/utils';
 import { Location, Subscription } from '../../../entities';
 import { IMyContext } from '../../types';
+import { getChatId } from '../../utils/getChatId';
 
 @Scene('timeScene')
 export class TimeScene extends BaseScene {
@@ -29,10 +30,7 @@ export class TimeScene extends BaseScene {
   @On('text')
   async saveTime(@Ctx() ctx: IMyContext, @Message('text') text: string) {
     try {
-      if (text === '❌ Cancel') {
-        await cancelScene(ctx, 'create');
-        return;
-      }
+      if (await isSceneCanceled(ctx, text, 'create')) return;
 
       if (!validateTime(text)) {
         await ctx.reply(
@@ -42,11 +40,10 @@ export class TimeScene extends BaseScene {
         return;
       }
 
-      if (!ctx.chat) {
-        return;
-      }
+      const chatId = getChatId(ctx, true);
+      if (!chatId) return;
 
-      const user = await this.botRepository.getUserByChatId(ctx.chat.id);
+      const user = await this.botRepository.getUserByChatId(chatId);
 
       if (!user) {
         return;

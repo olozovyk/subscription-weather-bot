@@ -25,14 +25,29 @@ export const exitScene = (ctx: IMyContext) => {
   ctx.scene.leave();
 };
 
-export const cancelScene = async (ctx: IMyContext, action: 'create') => {
+export const isSceneCanceled = async (
+  ctx: IMyContext,
+  text: string,
+  action: 'create' | 'delete' | 'timezone',
+): Promise<boolean | void> => {
+  if (text !== '❌ Cancel') return;
+
   let message = '';
+
   if (action === 'create') {
-    message = 'You canceled creating subscription';
+    message = 'You canceled creating of subscription';
+  }
+
+  if (action === 'delete') {
+    message = 'You canceled deleting of subscription';
+  }
+
+  if (action === 'timezone') {
+    message = 'You canceled setting a timezone';
   }
 
   exitScene(ctx);
 
   await ctx.reply(message, showMainKeyboard());
-  return;
+  return true;
 };

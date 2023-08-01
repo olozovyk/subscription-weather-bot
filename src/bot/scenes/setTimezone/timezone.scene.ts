@@ -3,9 +3,10 @@ import { Ctx, Message, On, Scene, SceneEnter } from 'nestjs-telegraf';
 import { BaseScene } from '../base.scene';
 import { BotRepository } from '../../bot.repository';
 import { showCancelSceneKeyboard, showMainKeyboard } from '../../keyboards';
-import { cancelScene, exitScene } from '../../utils';
+import { exitScene, isSceneCanceled } from '../../utils';
 import { validateTimezone } from '../../../common/utils';
 import { IMyContext } from '../../types';
+import { getChatId } from '../../utils/getChatId';
 
 @Scene('timezoneScene')
 export class TimezoneScene extends BaseScene {
@@ -24,10 +25,7 @@ export class TimezoneScene extends BaseScene {
   @On('text')
   async saveTimezone(@Ctx() ctx: IMyContext, @Message('text') text: string) {
     try {
-      if (text === '❌ Cancel') {
-        await cancelScene(ctx, 'create');
-        return;
-      }
+      if (await isSceneCanceled(ctx, text, 'timezone')) return;
 
       if (!validateTimezone(text)) {
         await ctx.reply(
@@ -37,12 +35,8 @@ export class TimezoneScene extends BaseScene {
         return;
       }
 
-      if (!ctx.chat) {
-        exitScene(ctx);
-        return ctx.scene.leave();
-      }
-
-      const chatId = ctx.chat.id;
+      const chatId = getChatId(ctx, true);
+      if (!chatId) return;
 
       await this.botRepository.setTimezone(chatId, text);
       await ctx.reply(`Timezone ${text} was saved`, showMainKeyboard());

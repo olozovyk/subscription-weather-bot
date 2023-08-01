@@ -3,7 +3,7 @@ import { Ctx, Message, On, Scene, SceneEnter } from 'nestjs-telegraf';
 import { BaseScene } from '../base.scene';
 import { BotRepository } from '../../bot.repository';
 import { showCancelSceneKeyboard, showMainKeyboard } from '../../keyboards';
-import { cancelScene, exitScene } from '../../utils';
+import { exitScene, isSceneCanceled } from '../../utils';
 import { IMyContext } from '../../types';
 
 @Scene('deleteSubscriptionScene')
@@ -26,15 +26,13 @@ export class DeleteSubscriptionScene extends BaseScene {
     @Message('text') text: string,
   ) {
     try {
-      if (text === '❌ Cancel') {
-        await cancelScene(ctx, 'create');
-        return;
-      }
+      if (await isSceneCanceled(ctx, text, 'delete')) return;
 
       const subscription = await this.botRepository.getSubscriptionByName(text);
 
       if (!subscription) {
-        return ctx.reply('A subscription with such a name is not existed.');
+        await ctx.reply('A subscription with such a name is not existed.');
+        return;
       }
 
       await this.botRepository.deleteSubscription(subscription);

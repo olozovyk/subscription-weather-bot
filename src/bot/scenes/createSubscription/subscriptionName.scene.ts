@@ -4,8 +4,9 @@ import { BaseScene } from '../base.scene';
 import { BotRepository } from '../../bot.repository';
 import { Subscription } from '../../../entities';
 import { showCancelSceneKeyboard, showMainKeyboard } from '../../keyboards';
-import { cancelScene, exitScene } from '../../utils';
+import { exitScene, isSceneCanceled } from '../../utils';
 import { IMyContext } from '../../types';
+import { getChatId } from '../../utils/getChatId';
 
 @Scene('subscriptionName')
 export class SubscriptionNameScene extends BaseScene {
@@ -16,12 +17,9 @@ export class SubscriptionNameScene extends BaseScene {
   @SceneEnter()
   async enter(@Ctx() ctx: IMyContext) {
     try {
-      if (!ctx.chat) {
-        exitScene(ctx);
-        return;
-      }
+      const chatId = getChatId(ctx, true);
+      if (!chatId) return;
 
-      const chatId = ctx.chat.id;
       const user = await this.botRepository.getUserByChatId(chatId);
 
       if (!user) {
@@ -54,10 +52,7 @@ export class SubscriptionNameScene extends BaseScene {
 
   @On('text')
   async setName(@Ctx() ctx: IMyContext, @Message('text') text: string) {
-    if (text === '❌ Cancel') {
-      await cancelScene(ctx, 'create');
-      return;
-    }
+    if (await isSceneCanceled(ctx, text, 'create')) return;
 
     const isNameExist = ctx.session.subscriptions.some(
       (subscription: Subscription) => subscription.name === text,
