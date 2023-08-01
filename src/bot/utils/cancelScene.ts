@@ -1,5 +1,6 @@
 import { IMyContext } from '../types/myContext.interface';
 import { showMainKeyboard } from '../keyboards/main.keyboard';
+import { messages } from '../messages';
 
 export const exitScene = (ctx: IMyContext) => {
   if (ctx.session.newSubscription) {
@@ -35,19 +36,19 @@ export const isSceneCanceled = async (
   let message = '';
 
   if (action === 'create') {
-    message = 'You canceled creating of subscription';
+    message = messages.canceledCreating;
   }
 
   if (action === 'delete') {
-    message = 'You canceled deleting of subscription';
+    message = messages.canceledDeleting;
   }
 
   if (action === 'timezone') {
-    message = 'You canceled setting a timezone';
+    message = messages.canceledSettingTimezone;
   }
 
   exitScene(ctx);
-
   await ctx.reply(message, showMainKeyboard());
+
   return true;
 };

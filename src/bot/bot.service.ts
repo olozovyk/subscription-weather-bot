@@ -16,6 +16,8 @@ import { convertDateToInputString } from '../common/utils/convertDateToInputStri
 import { Subscription } from '../entities/subscription.entity';
 import { User } from '../entities/user.entity';
 import { getChatId } from './utils/getChatId';
+import { messages } from './messages';
+import { logCaughtError } from '../common/utils';
 
 @Update()
 export class BotService {
@@ -65,7 +67,7 @@ export class BotService {
   @On('sticker')
   @On('text')
   async answerDefault(@Ctx() ctx: IMyContext) {
-    await ctx.reply('Please make your choice', showMainKeyboard());
+    await ctx.reply(messages.makeChoice, showMainKeyboard());
   }
 
   private async setMenu() {
@@ -87,12 +89,9 @@ export class BotService {
       }
 
       await this.setMenu();
-      await ctx.reply(
-        'In this bot you can create a subscription to get the weather forecast in the time you want',
-        showMainKeyboard(),
-      );
+      await ctx.reply(messages.start, showMainKeyboard());
     } catch (e) {
-      await ctx.reply(e.message);
+      logCaughtError(e, this.logger);
     }
   }
 
@@ -111,62 +110,22 @@ export class BotService {
       const subscriptions = await this.botRepository.getAllSubscriptions(user);
 
       if (!subscriptions.length) {
-        await ctx.reply(
-          `You don't have active subscriptions`,
-          showMainKeyboard(),
-        );
+        await ctx.reply(messages.noSubscriptions, showMainKeyboard());
         return;
       }
 
-      const subscriptionsMessage = this.getSubscriptionsMessage(
+      const subscriptionsMessage = messages.getAllSubscriptionsMessage(
         subscriptions,
         user,
       );
 
       await ctx.reply(subscriptionsMessage, showMainKeyboard());
     } catch (e) {
-      await ctx.reply(e.message);
+      logCaughtError(e, this.logger);
     }
   }
 
-  private getSubscriptionsMessage(
-    subscriptions: Subscription[],
-    user: User,
-  ): string {
-    let subscriptionMessage = 'You have next subscriptions:' + '\n\n';
-
-    subscriptions.map(async (subscription, idx) => {
-      const {
-        name,
-        time,
-        location: { name: locationName, country, state },
-      } = subscription;
-
-      const timeToShow = convertDateToInputString(time, user.timezone);
-
-      subscriptionMessage += `Name: ${name} \nTime: ${timeToShow} \nLocation: ${locationName}, ${country}`;
-
-      if (state) {
-        subscriptionMessage += ` ${state}`;
-      }
-
-      if (idx !== subscriptions.length - 1) {
-        subscriptionMessage += '\n\n';
-      }
-    });
-
-    return subscriptionMessage;
-  }
-
   private async helpHandler(ctx: IMyContext) {
-    await ctx.reply(
-      'In this bot you can create subscriptions to receive the weather forecast at the time you want.\n' +
-        '\n' +
-        'To create a subscription press the button "New subscription" and follow the instructions.\n' +
-        '\n' +
-        'By default the bot saves a time in the UTC format. To save a time in your timezone you should set a timezone by pressing the button “Set timezone”.\n' +
-        '\n' +
-        'You can create up to 5 subscriptions.',
-    );
+    await ctx.reply(messages.help, showMainKeyboard());
   }
 }

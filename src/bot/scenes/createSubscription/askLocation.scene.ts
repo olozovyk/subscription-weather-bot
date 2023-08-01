@@ -6,6 +6,7 @@ import { HttpService } from '../../../http/http.service';
 import { showCancelSceneKeyboard } from '../../keyboards';
 import { isSceneCanceled, normalizeQueryLocationString } from '../../utils';
 import { ILocation, IMyContext } from '../../types';
+import { messages } from '../../messages';
 
 @Scene('askLocation')
 export class AskLocationScene extends BaseScene {
@@ -21,10 +22,7 @@ export class AskLocationScene extends BaseScene {
 
   @SceneEnter()
   async enter(@Ctx() ctx: IMyContext) {
-    await ctx.reply(
-      'Please tell the location you want the weather for?',
-      showCancelSceneKeyboard(),
-    );
+    await ctx.reply(messages.askLocation, showCancelSceneKeyboard());
   }
 
   @On('text')
@@ -38,10 +36,7 @@ export class AskLocationScene extends BaseScene {
     const locations = await this.httpService.get<ILocation[]>(url);
 
     if (!locations?.length) {
-      await ctx.reply(
-        'Such a location has not found. Please try another one',
-        showCancelSceneKeyboard(),
-      );
+      await ctx.reply(messages.locationNotFound, showCancelSceneKeyboard());
       return;
     }
 

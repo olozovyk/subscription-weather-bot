@@ -1,16 +1,8 @@
 import { Markup } from 'telegraf';
+import { messages } from '../messages';
 
 export const showMainKeyboard = () => {
-  return Markup.keyboard(
-    [
-      'New subscription',
-      'All subscriptions',
-      'Delete subscription',
-      'Set timezone',
-      'Help',
-    ],
-    {
-      columns: 2,
-    },
-  ).resize(true);
+  return Markup.keyboard(messages.mainKeyboard, {
+    columns: 2,
+  }).resize(true);
 };

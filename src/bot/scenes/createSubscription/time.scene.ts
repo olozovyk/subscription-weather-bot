@@ -7,11 +7,14 @@ import { exitScene, isSceneCanceled } from '../../utils';
 import {
   convertInputStringToDate,
   getTimeToShow,
+  logCaughtError,
   validateTime,
 } from '../../../common/utils';
 import { Location, Subscription } from '../../../entities';
 import { IMyContext } from '../../types';
 import { getChatId } from '../../utils/getChatId';
+import { messages } from '../../messages';
+import { Logger } from '@nestjs/common';
 
 @Scene('timeScene')
 export class TimeScene extends BaseScene {
@@ -19,12 +22,11 @@ export class TimeScene extends BaseScene {
     super();
   }
 
+  private logger = new Logger(TimeScene.name);
+
   @SceneEnter()
   async enter(@Ctx() ctx: IMyContext) {
-    await ctx.reply(
-      `Please set a time for your subscription, e.g., 14:27 (24-hour format). If you don't send your timezone to the bot, you should use the UTC timezone.`,
-      showCancelSceneKeyboard(),
-    );
+    await ctx.reply(messages.askTime, showCancelSceneKeyboard());
   }
 
   @On('text')
@@ -34,7 +36,7 @@ export class TimeScene extends BaseScene {
 
       if (!validateTime(text)) {
         await ctx.reply(
-          'Please set a time for your subscription, e.g., 14:30 (24-hour format)',
+          messages.timeFormatIsNotValid,
           showCancelSceneKeyboard(),
         );
         return;
@@ -75,15 +77,17 @@ export class TimeScene extends BaseScene {
       await this.botRepository.saveSubscription(subscription);
 
       await ctx.reply(
-        `You scheduled a subscription for ${location.name} ${
-          location.country
-        } to be sent weather forecast at ${getTimeToShow(timeLocal)}`,
+        messages.getSubscriptionSummary(
+          location.name,
+          location.country,
+          timeLocal,
+        ),
         showMainKeyboard(),
       );
 
       exitScene(ctx);
     } catch (e) {
-      await ctx.reply(e.message);
+      logCaughtError(e, this.logger);
       exitScene(ctx);
     }
   }

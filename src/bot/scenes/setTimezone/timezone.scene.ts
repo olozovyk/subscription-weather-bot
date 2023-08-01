@@ -4,9 +4,11 @@ import { BaseScene } from '../base.scene';
 import { BotRepository } from '../../bot.repository';
 import { showCancelSceneKeyboard, showMainKeyboard } from '../../keyboards';
 import { exitScene, isSceneCanceled } from '../../utils';
-import { validateTimezone } from '../../../common/utils';
+import { logCaughtError, validateTimezone } from '../../../common/utils';
 import { IMyContext } from '../../types';
 import { getChatId } from '../../utils/getChatId';
+import { messages } from '../../messages';
+import { Logger } from '@nestjs/common';
 
 @Scene('timezoneScene')
 export class TimezoneScene extends BaseScene {
@@ -14,12 +16,11 @@ export class TimezoneScene extends BaseScene {
     super();
   }
 
+  private logger = new Logger(TimezoneScene.name);
+
   @SceneEnter()
   async enter(@Ctx() ctx: IMyContext) {
-    await ctx.reply(
-      `Please tell your timezone in format 'Europe/Kyiv'`,
-      showCancelSceneKeyboard(),
-    );
+    await ctx.reply(messages.askForTimezone, showCancelSceneKeyboard());
   }
 
   @On('text')
@@ -29,7 +30,7 @@ export class TimezoneScene extends BaseScene {
 
       if (!validateTimezone(text)) {
         await ctx.reply(
-          'Entered setTimezone is not valid. Please send another one or cancel',
+          messages.timeFormatIsNotValid,
           showCancelSceneKeyboard(),
         );
         return;
@@ -39,11 +40,14 @@ export class TimezoneScene extends BaseScene {
       if (!chatId) return;
 
       await this.botRepository.setTimezone(chatId, text);
-      await ctx.reply(`Timezone ${text} was saved`, showMainKeyboard());
+      await ctx.reply(
+        messages.getTimezoneSavedString(text),
+        showMainKeyboard(),
+      );
 
       exitScene(ctx);
     } catch (e) {
-      await ctx.reply(e.message);
+      logCaughtError(e, this.logger);
       exitScene(ctx);
     }
   }

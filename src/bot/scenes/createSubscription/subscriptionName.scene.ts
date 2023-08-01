@@ -7,12 +7,17 @@ import { showCancelSceneKeyboard, showMainKeyboard } from '../../keyboards';
 import { exitScene, isSceneCanceled } from '../../utils';
 import { IMyContext } from '../../types';
 import { getChatId } from '../../utils/getChatId';
+import { Logger } from '@nestjs/common';
+import { messages } from '../../messages';
+import { logCaughtError } from '../../../common/utils';
 
 @Scene('subscriptionName')
 export class SubscriptionNameScene extends BaseScene {
   constructor(private botRepository: BotRepository) {
     super();
   }
+
+  private logger = new Logger(SubscriptionNameScene.name);
 
   @SceneEnter()
   async enter(@Ctx() ctx: IMyContext) {
@@ -23,7 +28,7 @@ export class SubscriptionNameScene extends BaseScene {
       const user = await this.botRepository.getUserByChatId(chatId);
 
       if (!user) {
-        await ctx.reply('User is not found');
+        this.logger.error('User is not found');
         exitScene(ctx);
         return;
       }
@@ -32,20 +37,14 @@ export class SubscriptionNameScene extends BaseScene {
       ctx.session.subscriptions = subscriptions;
 
       if (subscriptions.length >= 5) {
-        await ctx.reply(
-          'You can add no more than 5 subscriptions.',
-          showMainKeyboard(),
-        );
+        await ctx.reply(messages.subscriptionsMaxOut, showMainKeyboard());
         exitScene(ctx);
         return;
       }
 
-      await ctx.reply(
-        'What name would you like to give to your new subscription?',
-        showCancelSceneKeyboard(),
-      );
+      await ctx.reply(messages.askSubscriptionName, showCancelSceneKeyboard());
     } catch (e) {
-      await ctx.reply(e.message);
+      logCaughtError(e, this.logger);
       exitScene(ctx);
     }
   }
@@ -59,10 +58,7 @@ export class SubscriptionNameScene extends BaseScene {
     );
 
     if (isNameExist) {
-      await ctx.reply(
-        'You already have a subscription with such a name. Please give an another name',
-        showCancelSceneKeyboard(),
-      );
+      await ctx.reply(messages.nameExists, showCancelSceneKeyboard());
       return;
     }
 

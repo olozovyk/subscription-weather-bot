@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import axios from 'axios';
+import { logCaughtError } from '../common/utils';
 
 @Injectable()
 export class HttpService {
@@ -10,9 +11,7 @@ export class HttpService {
       const response = await axios(url);
       return response.data;
     } catch (e) {
-      if (e instanceof Error) {
-        this.logger.error(e.message);
-      }
+      logCaughtError(e, this.logger);
     }
   }
 }

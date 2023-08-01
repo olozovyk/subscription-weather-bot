@@ -5,6 +5,9 @@ import { BotRepository } from '../../bot.repository';
 import { showCancelSceneKeyboard, showMainKeyboard } from '../../keyboards';
 import { exitScene, isSceneCanceled } from '../../utils';
 import { IMyContext } from '../../types';
+import { messages } from '../../messages';
+import { logCaughtError } from '../../../common/utils';
+import { Logger } from '@nestjs/common';
 
 @Scene('deleteSubscriptionScene')
 export class DeleteSubscriptionScene extends BaseScene {
@@ -12,10 +15,12 @@ export class DeleteSubscriptionScene extends BaseScene {
     super();
   }
 
+  private logger = new Logger(DeleteSubscriptionScene.name);
+
   @SceneEnter()
   async enter(@Ctx() ctx: IMyContext) {
     await ctx.reply(
-      `Which subscription would you like to delete? Specify a name for the subscription.`,
+      messages.whichSubscriptionDelete,
       showCancelSceneKeyboard(),
     );
   }
@@ -31,15 +36,18 @@ export class DeleteSubscriptionScene extends BaseScene {
       const subscription = await this.botRepository.getSubscriptionByName(text);
 
       if (!subscription) {
-        await ctx.reply('A subscription with such a name is not existed.');
+        await ctx.reply(
+          messages.subscriptionDoesNotExist,
+          showCancelSceneKeyboard(),
+        );
         return;
       }
 
       await this.botRepository.deleteSubscription(subscription);
-      await ctx.reply('The subscription is deleted', showMainKeyboard());
+      await ctx.reply(messages.successfulDeleting, showMainKeyboard());
       exitScene(ctx);
     } catch (e) {
-      await ctx.reply(e.message);
+      logCaughtError(e, this.logger);
       exitScene(ctx);
     }
   }
