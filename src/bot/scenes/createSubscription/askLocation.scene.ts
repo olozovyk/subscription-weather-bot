@@ -4,8 +4,9 @@ import { ConfigService } from '@nestjs/config';
 import { BaseScene } from '../base.scene';
 import { HttpService } from '../../../http/http.service';
 import { showCancelSceneKeyboard } from '../../keyboards';
-import { cancelScene, normalizeQueryLocationString } from '../../utils';
+import { isSceneCanceled, normalizeQueryLocationString } from '../../utils';
 import { ILocation, IMyContext } from '../../types';
+import { messages } from '../../messages';
 
 @Scene('askLocation')
 export class AskLocationScene extends BaseScene {
@@ -16,34 +17,26 @@ export class AskLocationScene extends BaseScene {
     super();
   }
 
+  private geoUrl = this.configService.getOrThrow('GEOCODING_API_URL');
+  private apiKey = this.configService.getOrThrow('OPEN_WEATHER_API_KEY');
+
   @SceneEnter()
   async enter(@Ctx() ctx: IMyContext) {
-    await ctx.reply(
-      'Please tell the location you want the weather for?',
-      showCancelSceneKeyboard(),
-    );
+    await ctx.reply(messages.askLocation, showCancelSceneKeyboard());
   }
 
   @On('text')
   async askLocation(@Ctx() ctx: IMyContext, @Message('text') text: string) {
-    if (text === '❌ Cancel') {
-      await cancelScene(ctx, 'create');
-      return;
-    }
-
-    const geoUrl = this.configService.getOrThrow('GEOCODING_API_URL');
-    const apiKey = this.configService.getOrThrow('OPEN_WEATHER_API_KEY');
+    if (await isSceneCanceled(ctx, text, 'create')) return;
 
     const locationQuery = normalizeQueryLocationString(text);
 
-    const url = geoUrl + `q=${locationQuery}&limit=${5}&appid=${apiKey}`;
+    const url =
+      this.geoUrl + `q=${locationQuery}&limit=${5}&appid=${this.apiKey}`;
     const locations = await this.httpService.get<ILocation[]>(url);
 
-    if (!locations || !locations.length) {
-      await ctx.reply(
-        'Such a location has not found. Please try another one',
-        showCancelSceneKeyboard(),
-      );
+    if (!locations?.length) {
+      await ctx.reply(messages.locationNotFound, showCancelSceneKeyboard());
       return;
     }
 

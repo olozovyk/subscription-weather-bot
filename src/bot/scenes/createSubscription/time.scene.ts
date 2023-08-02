@@ -1,16 +1,18 @@
 import { Ctx, Message, On, Scene, SceneEnter } from 'nestjs-telegraf';
+import { Logger } from '@nestjs/common';
 
 import { BaseScene } from '../base.scene';
 import { BotRepository } from '../../bot.repository';
 import { showCancelSceneKeyboard, showMainKeyboard } from '../../keyboards';
-import { cancelScene, exitScene } from '../../utils';
+import { exitScene, getChatId, isSceneCanceled } from '../../utils';
 import {
   convertInputStringToDate,
-  getTimeToShow,
+  logCaughtError,
   validateTime,
 } from '../../../common/utils';
 import { Location, Subscription } from '../../../entities';
 import { IMyContext } from '../../types';
+import { messages } from '../../messages';
 
 @Scene('timeScene')
 export class TimeScene extends BaseScene {
@@ -18,35 +20,30 @@ export class TimeScene extends BaseScene {
     super();
   }
 
+  private logger = new Logger(TimeScene.name);
+
   @SceneEnter()
   async enter(@Ctx() ctx: IMyContext) {
-    await ctx.reply(
-      `Please set a time for your subscription, e.g., 14:27 (24-hour format). If you don't send your timezone to the bot, you should use the UTC timezone.`,
-      showCancelSceneKeyboard(),
-    );
+    await ctx.reply(messages.askTime, showCancelSceneKeyboard());
   }
 
   @On('text')
   async saveTime(@Ctx() ctx: IMyContext, @Message('text') text: string) {
     try {
-      if (text === '❌ Cancel') {
-        await cancelScene(ctx, 'create');
-        return;
-      }
+      if (await isSceneCanceled(ctx, text, 'create')) return;
 
       if (!validateTime(text)) {
         await ctx.reply(
-          'Please set a time for your subscription, e.g., 14:30 (24-hour format)',
+          messages.timeFormatIsNotValid,
           showCancelSceneKeyboard(),
         );
         return;
       }
 
-      if (!ctx.chat) {
-        return;
-      }
+      const chatId = getChatId(ctx, true);
+      if (!chatId) return;
 
-      const user = await this.botRepository.getUserByChatId(ctx.chat.id);
+      const user = await this.botRepository.getUserByChatId(chatId);
 
       if (!user) {
         return;
@@ -78,15 +75,17 @@ export class TimeScene extends BaseScene {
       await this.botRepository.saveSubscription(subscription);
 
       await ctx.reply(
-        `You scheduled a subscription for ${location.name} ${
-          location.country
-        } to be sent weather forecast at ${getTimeToShow(timeLocal)}`,
+        messages.getSubscriptionSummary(
+          location.name,
+          location.country,
+          timeLocal,
+        ),
         showMainKeyboard(),
       );
 
       exitScene(ctx);
     } catch (e) {
-      await ctx.reply(e.message);
+      logCaughtError(e, this.logger);
       exitScene(ctx);
     }
   }

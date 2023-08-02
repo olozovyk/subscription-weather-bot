@@ -1,5 +1,5 @@
 import { Ctx, On } from 'nestjs-telegraf';
-import { IMyContext } from '../types/myContext.interface';
+import { IMyContext } from '../types';
 
 export class BaseScene {
   @On('audio')

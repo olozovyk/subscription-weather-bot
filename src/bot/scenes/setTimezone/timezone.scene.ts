@@ -1,11 +1,13 @@
 import { Ctx, Message, On, Scene, SceneEnter } from 'nestjs-telegraf';
+import { Logger } from '@nestjs/common';
 
 import { BaseScene } from '../base.scene';
 import { BotRepository } from '../../bot.repository';
 import { showCancelSceneKeyboard, showMainKeyboard } from '../../keyboards';
-import { cancelScene, exitScene } from '../../utils';
-import { validateTimezone } from '../../../common/utils';
+import { exitScene, getChatId, isSceneCanceled } from '../../utils';
+import { logCaughtError, validateTimezone } from '../../../common/utils';
 import { IMyContext } from '../../types';
+import { messages } from '../../messages';
 
 @Scene('timezoneScene')
 export class TimezoneScene extends BaseScene {
@@ -13,43 +15,38 @@ export class TimezoneScene extends BaseScene {
     super();
   }
 
+  private logger = new Logger(TimezoneScene.name);
+
   @SceneEnter()
   async enter(@Ctx() ctx: IMyContext) {
-    await ctx.reply(
-      `Please tell your timezone in format 'Europe/Kyiv'`,
-      showCancelSceneKeyboard(),
-    );
+    await ctx.reply(messages.askForTimezone, showCancelSceneKeyboard());
   }
 
   @On('text')
   async saveTimezone(@Ctx() ctx: IMyContext, @Message('text') text: string) {
     try {
-      if (text === '❌ Cancel') {
-        await cancelScene(ctx, 'create');
-        return;
-      }
+      if (await isSceneCanceled(ctx, text, 'timezone')) return;
 
       if (!validateTimezone(text)) {
         await ctx.reply(
-          'Entered setTimezone is not valid. Please send another one or cancel',
+          messages.timeFormatIsNotValid,
           showCancelSceneKeyboard(),
         );
         return;
       }
 
-      if (!ctx.chat) {
-        exitScene(ctx);
-        return ctx.scene.leave();
-      }
-
-      const chatId = ctx.chat.id;
+      const chatId = getChatId(ctx, true);
+      if (!chatId) return;
 
       await this.botRepository.setTimezone(chatId, text);
-      await ctx.reply(`Timezone ${text} was saved`, showMainKeyboard());
+      await ctx.reply(
+        messages.getTimezoneSavedString(text),
+        showMainKeyboard(),
+      );
 
       exitScene(ctx);
     } catch (e) {
-      await ctx.reply(e.message);
+      logCaughtError(e, this.logger);
       exitScene(ctx);
     }
   }

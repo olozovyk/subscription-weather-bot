@@ -1,5 +1,6 @@
 import { Markup } from 'telegraf';
+import { messages } from '../messages';
 
 export const showCancelSceneKeyboard = () => {
-  return Markup.keyboard(['❌ Cancel']).resize(true);
+  return Markup.keyboard(messages.cancelSceneKeyboard).resize(true);
 };
