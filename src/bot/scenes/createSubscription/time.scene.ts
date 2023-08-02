@@ -1,20 +1,18 @@
 import { Ctx, Message, On, Scene, SceneEnter } from 'nestjs-telegraf';
+import { Logger } from '@nestjs/common';
 
 import { BaseScene } from '../base.scene';
 import { BotRepository } from '../../bot.repository';
 import { showCancelSceneKeyboard, showMainKeyboard } from '../../keyboards';
-import { exitScene, isSceneCanceled } from '../../utils';
+import { exitScene, getChatId, isSceneCanceled } from '../../utils';
 import {
   convertInputStringToDate,
-  getTimeToShow,
   logCaughtError,
   validateTime,
 } from '../../../common/utils';
 import { Location, Subscription } from '../../../entities';
 import { IMyContext } from '../../types';
-import { getChatId } from '../../utils/getChatId';
 import { messages } from '../../messages';
-import { Logger } from '@nestjs/common';
 
 @Scene('timeScene')
 export class TimeScene extends BaseScene {

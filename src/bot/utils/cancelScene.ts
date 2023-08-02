@@ -1,5 +1,5 @@
-import { IMyContext } from '../types/myContext.interface';
-import { showMainKeyboard } from '../keyboards/main.keyboard';
+import { IMyContext } from '../types';
+import { showMainKeyboard } from '../keyboards';
 import { messages } from '../messages';
 
 export const exitScene = (ctx: IMyContext) => {
@@ -33,22 +33,14 @@ export const isSceneCanceled = async (
 ): Promise<boolean | void> => {
   if (text !== '❌ Cancel') return;
 
-  let message = '';
-
-  if (action === 'create') {
-    message = messages.canceledCreating;
-  }
-
-  if (action === 'delete') {
-    message = messages.canceledDeleting;
-  }
-
-  if (action === 'timezone') {
-    message = messages.canceledSettingTimezone;
-  }
+  const dict = {
+    create: messages.canceledCreating,
+    delete: messages.canceledDeleting,
+    timezone: messages.canceledSettingTimezone,
+  };
 
   exitScene(ctx);
-  await ctx.reply(message, showMainKeyboard());
+  await ctx.reply(dict[action], showMainKeyboard());
 
   return true;
 };

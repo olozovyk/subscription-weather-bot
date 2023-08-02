@@ -1,13 +1,12 @@
 import { Ctx, Message, On, Scene, SceneEnter } from 'nestjs-telegraf';
+import { Logger } from '@nestjs/common';
 
 import { BaseScene } from '../base.scene';
 import { BotRepository } from '../../bot.repository';
 import { Subscription } from '../../../entities';
 import { showCancelSceneKeyboard, showMainKeyboard } from '../../keyboards';
-import { exitScene, isSceneCanceled } from '../../utils';
+import { exitScene, getChatId, isSceneCanceled } from '../../utils';
 import { IMyContext } from '../../types';
-import { getChatId } from '../../utils/getChatId';
-import { Logger } from '@nestjs/common';
 import { messages } from '../../messages';
 import { logCaughtError } from '../../../common/utils';
 

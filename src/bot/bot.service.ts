@@ -8,14 +8,12 @@ import {
   Update,
 } from 'nestjs-telegraf';
 import { Telegraf } from 'telegraf';
-import { IMyContext } from './types/myContext.interface';
-import { showMainKeyboard } from './keyboards/main.keyboard';
-import { BotRepository } from './bot.repository';
 import { Logger } from '@nestjs/common';
-import { convertDateToInputString } from '../common/utils/convertDateToInputString';
-import { Subscription } from '../entities/subscription.entity';
-import { User } from '../entities/user.entity';
-import { getChatId } from './utils/getChatId';
+
+import { IMyContext } from './types';
+import { showMainKeyboard } from './keyboards';
+import { BotRepository } from './bot.repository';
+import { getChatId } from './utils';
 import { messages } from './messages';
 import { logCaughtError } from '../common/utils';
 
