@@ -4,3 +4,4 @@ export * from './convertInputStringToDate';
 export * from './getTimeToShow';
 export * from './validateTimezone';
 export * from './logCatchedError';
+export * from './getCurrentUTCTime';
