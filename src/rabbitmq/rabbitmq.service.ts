@@ -62,7 +62,9 @@ export class RabbitMQService {
       }
 
       const { connection, channel } = configRes;
-      channel.publish(exchangeName, routingKey, Buffer.from(payload));
+      channel.publish(exchangeName, routingKey, Buffer.from(payload), {
+        persistent: true,
+      });
 
       setTimeout(() => {
         connection.close();
