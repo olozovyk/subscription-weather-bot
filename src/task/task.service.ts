@@ -2,10 +2,16 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { getCurrentUTCTime } from '../common/utils';
 import { TaskRepository } from './task.repository';
+import { RabbitMQService } from '../rabbitmq/rabbitmq.service';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class TaskService {
-  constructor(private taskRepository: TaskRepository) {}
+  constructor(
+    private readonly taskRepository: TaskRepository,
+    private readonly rabbitMQService: RabbitMQService,
+    private readonly configService: ConfigService,
+  ) {}
 
   private logger = new Logger(TaskService.name);
 
@@ -21,6 +27,13 @@ export class TaskService {
     );
 
     subscriptions.forEach(item => {
+      this.rabbitMQService.sendToQueue({
+        exchangeType: this.configService.getOrThrow('EXCHANGE_TYPE'),
+        exchangeName: this.configService.getOrThrow('EXCHANGE_NAME'),
+        queue: this.configService.getOrThrow('QUEUE'),
+        routingKey: this.configService.getOrThrow('QUEUE'),
+        payload: JSON.stringify(item),
+      });
       this.logger.log(JSON.stringify(item));
     });
   }
