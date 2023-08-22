@@ -11,7 +11,7 @@ import { RabbitMQModule } from './rabbitmq/rabbitmq.module';
 @Module({
   imports: [
     ConfigModule.forRoot(),
-    TypeOrmModule.forRoot({ ...postgresConfig }),
+    TypeOrmModule.forRoot(postgresConfig),
     BotModule,
     HttpModule,
     TaskModule,

@@ -15,6 +15,13 @@ export class TaskService {
 
   private logger = new Logger(TaskService.name);
 
+  private rabbitSendOptions = {
+    exchangeType: this.configService.getOrThrow('EXCHANGE_TYPE'),
+    exchangeName: this.configService.getOrThrow('EXCHANGE_NAME'),
+    queue: this.configService.getOrThrow('QUEUE'),
+    routingKey: this.configService.getOrThrow('ROUTING_KEY'),
+  };
+
   @Cron('00 * * * * *')
   async handleCron() {
     const { hours, minutes } = getCurrentUTCTime();
@@ -28,10 +35,7 @@ export class TaskService {
 
     subscriptions.forEach(item => {
       this.rabbitMQService.sendToQueue({
-        exchangeType: this.configService.getOrThrow('EXCHANGE_TYPE'),
-        exchangeName: this.configService.getOrThrow('EXCHANGE_NAME'),
-        queue: this.configService.getOrThrow('QUEUE'),
-        routingKey: this.configService.getOrThrow('QUEUE'),
+        ...this.rabbitSendOptions,
         payload: JSON.stringify(item),
       });
       this.logger.log(JSON.stringify(item));
