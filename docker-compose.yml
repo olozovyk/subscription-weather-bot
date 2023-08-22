@@ -12,6 +12,17 @@ services:
       - postgres_data_bot:/var/lib/postgresql/data
     ports:
       - ${DOCKER_COMPOSE_POSTGRES_PORTS}
+  rabbitmq:
+    image: rabbitmq:3.12-management
+    hostname: rabbit-bot
+    restart: always
+    container_name: rabbitmq
+    ports:
+      - ${RABBITMQ_PORTS}
+      - ${RABBITMQ_MANAGEMENT_PORTS}
+    volumes:
+      - rabbitmq_data_bot:/var/lib/rabbitmq
 
 volumes:
   postgres_data_bot:
+  rabbitmq_data_bot:
