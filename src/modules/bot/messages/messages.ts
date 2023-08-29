@@ -8,17 +8,17 @@ export const messages = {
   start:
     'In this bot you can create a subscription to get the weather forecast in the time you want',
   help:
-    'In this bot you can create subscription to receive the weather forecast at the time you want.\n' +
+    'In this bot you can create subscriptions to receive the weather forecast at the time you want.\n' +
     '\n' +
     'To create a subscription press the button "New subscription" and follow the instructions.\n' +
     '\n' +
     'By default the bot saves a time in the UTC format. To save a time in your timezone you should set a timezone by pressing the button “Set timezone”.\n' +
     '\n' +
-    'You can create up to 5 subscription.',
+    'You can create up to 5 subscriptions.',
 
   noSubscriptions: `You don't have active subscriptions`,
 
-  subscriptionsMaxOut: 'You can add no more than 5 subscription',
+  subscriptionsMaxOut: 'You can add no more than 5 subscriptions',
   askSubscriptionName:
     'What name would you like to give to your new subscription?',
   nameExists:
@@ -81,7 +81,7 @@ export const messages = {
     subscriptions: Subscription[],
     user: User,
   ): string {
-    let subscriptionMessage = 'You have next subscription:' + '\n\n';
+    let subscriptionMessage = 'You have next subscriptions:' + '\n\n';
 
     subscriptions.map(async (subscription, idx) => {
       const {
@@ -108,7 +108,7 @@ export const messages = {
 
   mainKeyboard: [
     'New subscription',
-    'All subscription',
+    'All subscriptions',
     'Delete subscription',
     'Set timezone',
     'Help',
