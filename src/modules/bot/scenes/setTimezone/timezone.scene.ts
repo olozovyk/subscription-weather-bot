@@ -7,11 +7,11 @@ import { exitScene, getChatId, isSceneCanceled } from '../../utils';
 import { logCaughtError, validateTimezone } from '../../../../common/utils';
 import { IMyContext } from '../../types';
 import { messages } from '../../messages';
-import { UsersService } from '../../../users/users.service';
+import { UserService } from '../../../user/user.service';
 
 @Scene('timezoneScene')
 export class TimezoneScene extends BaseScene {
-  constructor(private readonly usersService: UsersService) {
+  constructor(private readonly usersService: UserService) {
     super();
   }
 

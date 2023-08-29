@@ -7,11 +7,11 @@ import { IMyContext } from '../../types';
 import { messages } from '../../messages';
 import { logCaughtError } from '../../../../common/utils';
 import { Logger } from '@nestjs/common';
-import { SubscriptionsService } from '../../../subscriptions/subscriptions.service';
+import { SubscriptionService } from '../../../subscription/subscription.service';
 
 @Scene('deleteSubscriptionScene')
 export class DeleteSubscriptionScene extends BaseScene {
-  constructor(private readonly subscriptionsService: SubscriptionsService) {
+  constructor(private readonly subscriptionsService: SubscriptionService) {
     super();
   }
 

@@ -2,17 +2,17 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { ConfigService } from '@nestjs/config';
 
-import { SubscriptionsService } from '../subscriptions/subscriptions.service';
+import { SubscriptionService } from '../subscription/subscription.service';
 import { getCurrentUTCTime } from '../../common/utils';
 
 @Injectable()
-export class TasksService {
+export class CronService {
   constructor(
-    private readonly subscriptionService: SubscriptionsService,
+    private readonly subscriptionService: SubscriptionService,
     private readonly configService: ConfigService,
   ) {}
 
-  private logger = new Logger(TasksService.name);
+  private logger = new Logger(CronService.name);
 
   @Cron('00 * * * * *')
   async handleCron() {

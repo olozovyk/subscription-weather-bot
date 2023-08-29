@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { SubscriptionsRepository } from './subscriptions.repository';
+import { SubscriptionRepository } from './subscription.repository';
 import { Subscription } from './entities';
-import { User } from '../users/user.entity';
+import { User } from '../user/user.entity';
+import { Nullable } from '../../common/types';
 
 @Injectable()
-export class SubscriptionsService {
+export class SubscriptionService {
   constructor(
-    private readonly subscriptionsRepository: SubscriptionsRepository,
+    private readonly subscriptionsRepository: SubscriptionRepository,
   ) {}
 
   public saveSubscription(subscription: Subscription): Promise<Subscription> {
@@ -19,7 +20,7 @@ export class SubscriptionsService {
 
   public getSubscriptionByName(
     subscriptionName: string,
-  ): Promise<Subscription | null> {
+  ): Promise<Nullable<Subscription>> {
     return this.subscriptionsRepository.getSubscriptionByName(subscriptionName);
   }
 
