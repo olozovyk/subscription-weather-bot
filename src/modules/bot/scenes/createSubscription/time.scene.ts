@@ -9,17 +9,17 @@ import {
   logCaughtError,
   validateTime,
 } from '../../../../common/utils';
-import { Location, Subscription } from '../../../subscriptions/entities';
+import { Location, Subscription } from '../../../subscription/entities';
 import { IMyContext } from '../../types';
 import { messages } from '../../messages';
-import { SubscriptionsService } from '../../../subscriptions/subscriptions.service';
-import { UsersService } from '../../../users/users.service';
+import { SubscriptionService } from '../../../subscription/subscription.service';
+import { UserService } from '../../../user/user.service';
 
 @Scene('timeScene')
 export class TimeScene extends BaseScene {
   constructor(
-    private readonly subscriptionsService: SubscriptionsService,
-    private readonly usersService: UsersService,
+    private readonly subscriptionsService: SubscriptionService,
+    private readonly usersService: UserService,
   ) {
     super();
   }

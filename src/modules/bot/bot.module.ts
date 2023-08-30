@@ -14,15 +14,15 @@ import {
 import { HttpService } from '../../common/http/http.service';
 import { TimezoneScene } from './scenes/setTimezone';
 import { DeleteSubscriptionScene } from './scenes/deleteSubscription';
-import { SubscriptionsModule } from '../subscriptions/subscriptions.module';
-import { UsersModule } from '../users/users.module';
+import { SubscriptionModule } from '../subscription/subscription.module';
+import { UserModule } from '../user/user.module';
 
 const sessions = new LocalSession({ database: 'sessions.json' });
 
 @Module({
   imports: [
     TelegrafModule.forRootAsync({
-      imports: [ConfigModule, SubscriptionsModule],
+      imports: [ConfigModule, SubscriptionModule],
       useFactory: (configService: ConfigService) => ({
         token: configService.getOrThrow('BOT_TOKEN'),
         middlewares: [sessions.middleware()],
@@ -31,8 +31,8 @@ const sessions = new LocalSession({ database: 'sessions.json' });
     }),
     HttpModule,
     ConfigModule,
-    SubscriptionsModule,
-    UsersModule,
+    SubscriptionModule,
+    UserModule,
   ],
   providers: [
     BotService,

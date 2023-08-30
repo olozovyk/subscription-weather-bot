@@ -3,10 +3,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { Subscription } from './entities';
-import { User } from '../users/user.entity';
+import { User } from '../user/user.entity';
+import { Nullable } from '../../common/types';
 
 @Injectable()
-export class SubscriptionsRepository {
+export class SubscriptionRepository {
   constructor(
     @InjectRepository(Subscription)
     private subscriptionRepository: Repository<Subscription>,
@@ -25,7 +26,7 @@ export class SubscriptionsRepository {
 
   public getSubscriptionByName(
     subscriptionName: string,
-  ): Promise<Subscription | null> {
+  ): Promise<Nullable<Subscription>> {
     return this.subscriptionRepository.findOne({
       where: {
         name: subscriptionName,

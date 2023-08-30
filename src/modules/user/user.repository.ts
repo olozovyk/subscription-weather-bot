@@ -4,9 +4,10 @@ import { Repository, UpdateResult } from 'typeorm';
 
 import { User } from './user.entity';
 import { IUser } from './user.interface';
+import { Nullable } from '../../common/types';
 
 @Injectable()
-export class UsersRepository {
+export class UserRepository {
   constructor(
     @InjectRepository(User) private readonly usersRepository: Repository<User>,
   ) {}
@@ -15,7 +16,7 @@ export class UsersRepository {
     return this.usersRepository.save(user);
   }
 
-  public getUserByChatId(chatId: number): Promise<User | null> {
+  public getUserByChatId(chatId: number): Promise<Nullable<User>> {
     return this.usersRepository.findOneBy({ chatId });
   }
 

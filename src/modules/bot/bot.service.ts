@@ -15,15 +15,15 @@ import { showMainKeyboard } from './keyboards';
 import { getChatId } from './utils';
 import { messages } from './messages';
 import { logCaughtError } from '../../common/utils';
-import { SubscriptionsService } from '../subscriptions/subscriptions.service';
-import { UsersService } from '../users/users.service';
+import { SubscriptionService } from '../subscription/subscription.service';
+import { UserService } from '../user/user.service';
 
 @Update()
 export class BotService {
   constructor(
     @InjectBot() private bot: Telegraf,
-    private readonly subscriptionsService: SubscriptionsService,
-    private readonly usersService: UsersService,
+    private readonly subscriptionsService: SubscriptionService,
+    private readonly usersService: UserService,
   ) {}
 
   private logger = new Logger(BotService.name);
@@ -49,7 +49,7 @@ export class BotService {
     await ctx.scene.enter('timezoneScene');
   }
 
-  @Hears('All subscriptions')
+  @Hears('All subscription')
   async showSubscriptions(@Ctx() ctx: IMyContext) {
     await this.getSubscriptionsHandler(ctx);
   }

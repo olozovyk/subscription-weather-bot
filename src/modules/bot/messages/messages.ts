@@ -1,7 +1,7 @@
 import { convertDateToInputString, getTimeToShow } from '../../../common/utils';
 import { ILocation } from '../types';
-import { Subscription } from '../../subscriptions/entities';
-import { User } from '../../users/user.entity';
+import { Subscription } from '../../subscription/entities';
+import { User } from '../../user/user.entity';
 
 export const messages = {
   makeChoice: 'Please make your choice',

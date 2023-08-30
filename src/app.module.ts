@@ -5,9 +5,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { postgresConfig } from './common/DBConfigs';
 import { BotModule } from './modules/bot/bot.module';
 import { HttpModule } from './common/http/http.module';
-import { TasksModule } from './modules/tasks/tasks.module';
-import { SubscriptionsModule } from './modules/subscriptions/subscriptions.module';
-import { UsersModule } from './modules/users/users.module';
+import { CronModule } from './modules/cron/cron.module';
+import { SubscriptionModule } from './modules/subscription/subscription.module';
+import { UserModule } from './modules/user/user.module';
 
 @Module({
   imports: [
@@ -15,9 +15,9 @@ import { UsersModule } from './modules/users/users.module';
     TypeOrmModule.forRoot(postgresConfig),
     BotModule,
     HttpModule,
-    TasksModule,
-    SubscriptionsModule,
-    UsersModule,
+    CronModule,
+    SubscriptionModule,
+    UserModule,
   ],
   controllers: [],
   providers: [],

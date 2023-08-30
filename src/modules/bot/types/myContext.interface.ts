@@ -1,6 +1,6 @@
 import { Context } from 'telegraf';
 import { ILocation } from './location.interface';
-import { Subscription } from '../../subscriptions/entities';
+import { Subscription } from '../../subscription/entities';
 
 type MySession = any & {
   locations: ILocation[];

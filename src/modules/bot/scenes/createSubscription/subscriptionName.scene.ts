@@ -2,20 +2,20 @@ import { Ctx, Message, On, Scene, SceneEnter } from 'nestjs-telegraf';
 import { Logger } from '@nestjs/common';
 
 import { BaseScene } from '../base.scene';
-import { Subscription } from '../../../subscriptions/entities';
+import { Subscription } from '../../../subscription/entities';
 import { showCancelSceneKeyboard, showMainKeyboard } from '../../keyboards';
 import { exitScene, getChatId, isSceneCanceled } from '../../utils';
 import { IMyContext } from '../../types';
 import { messages } from '../../messages';
 import { logCaughtError } from '../../../../common/utils';
-import { SubscriptionsService } from '../../../subscriptions/subscriptions.service';
-import { UsersService } from '../../../users/users.service';
+import { SubscriptionService } from '../../../subscription/subscription.service';
+import { UserService } from '../../../user/user.service';
 
 @Scene('subscriptionName')
 export class SubscriptionNameScene extends BaseScene {
   constructor(
-    private readonly subscriptionsService: SubscriptionsService,
-    private readonly usersService: UsersService,
+    private readonly subscriptionsService: SubscriptionService,
+    private readonly usersService: UserService,
   ) {
     super();
   }
