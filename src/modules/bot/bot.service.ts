@@ -49,7 +49,7 @@ export class BotService {
     await ctx.scene.enter('timezoneScene');
   }
 
-  @Hears('All subscription')
+  @Hears('All subscriptions')
   async showSubscriptions(@Ctx() ctx: IMyContext) {
     await this.getSubscriptionsHandler(ctx);
   }
