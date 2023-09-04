@@ -1,7 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Subscription } from '../subscription/entities';
+import { InjectBot } from 'nestjs-telegraf';
+import { Telegraf } from 'telegraf';
+
 import { HttpService } from '../../common/http/http.service';
 import { ConfigService } from '@nestjs/config';
+import { Subscription } from '../subscription/entities';
 import { IWeatherFromAPI, IWeatherItemFromAPI } from './types';
 import { getWindDirectionEmoji, roundNumber } from './utils';
 import {
@@ -9,8 +12,6 @@ import {
   getOutputDateStringByPattern,
   logCaughtError,
 } from '../../common/utils';
-import { InjectBot } from 'nestjs-telegraf';
-import { Markup, Telegraf } from 'telegraf';
 import { showMainKeyboard } from './keyboards';
 
 @Injectable()
