@@ -18,7 +18,7 @@ export class AskLocationScene extends BaseScene {
   }
 
   private geoUrl = this.configService.getOrThrow('GEOCODING_API_URL');
-  private apiKey = this.configService.getOrThrow('OPEN_WEATHER_API_KEY');
+  private apiKey = this.configService.getOrThrow('WEATHER_API_KEY');
 
   @SceneEnter()
   async enter(@Ctx() ctx: IMyContext) {
@@ -32,7 +32,7 @@ export class AskLocationScene extends BaseScene {
     const locationQuery = normalizeQueryLocationString(text);
 
     const url =
-      this.geoUrl + `q=${locationQuery}&limit=${5}&appid=${this.apiKey}`;
+      this.geoUrl + `?q=${locationQuery}&limit=${5}&appid=${this.apiKey}`;
     const locations = await this.httpService.get<ILocation[]>(url);
 
     if (!locations?.length) {

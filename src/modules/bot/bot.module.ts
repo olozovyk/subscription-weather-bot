@@ -16,6 +16,7 @@ import { TimezoneScene } from './scenes/setTimezone';
 import { DeleteSubscriptionScene } from './scenes/deleteSubscription';
 import { SubscriptionModule } from '../subscription/subscription.module';
 import { UserModule } from '../user/user.module';
+import { DeliveryWeatherService } from './deliveryWeather.service';
 
 const sessions = new LocalSession({ database: 'sessions.json' });
 
@@ -43,6 +44,8 @@ const sessions = new LocalSession({ database: 'sessions.json' });
     TimeScene,
     TimezoneScene,
     DeleteSubscriptionScene,
+    DeliveryWeatherService,
   ],
+  exports: [DeliveryWeatherService],
 })
 export class BotModule {}

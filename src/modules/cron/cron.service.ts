@@ -4,12 +4,14 @@ import { ConfigService } from '@nestjs/config';
 
 import { SubscriptionService } from '../subscription/subscription.service';
 import { getCurrentUTCTime } from '../../common/utils';
+import { DeliveryWeatherService } from '../bot/deliveryWeather.service';
 
 @Injectable()
 export class CronService {
   constructor(
     private readonly subscriptionService: SubscriptionService,
     private readonly configService: ConfigService,
+    private readonly deliveryWeatherService: DeliveryWeatherService,
   ) {}
 
   private logger = new Logger(CronService.name);
@@ -18,16 +20,11 @@ export class CronService {
   async handleCron() {
     const { hours, minutes } = getCurrentUTCTime();
 
-    this.logger.debug(`The task executed`);
-
     const subscriptions = await this.subscriptionService.getSubscriptionsByTime(
       hours,
       minutes,
     );
 
-    subscriptions.forEach(item => {
-      // TODO: run method from the bot module for delivering a forecast
-      this.logger.log(JSON.stringify(item));
-    });
+    this.deliveryWeatherService.deliveryMessage(subscriptions);
   }
 }

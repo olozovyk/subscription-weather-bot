@@ -1,4 +1,7 @@
-import { convertDateToInputString, getTimeToShow } from '../../../common/utils';
+import {
+  getOutputDateStringByPattern,
+  getTimeToShow,
+} from '../../../common/utils';
 import { ILocation } from '../types';
 import { Subscription } from '../../subscription/entities';
 import { User } from '../../user/user.entity';
@@ -90,7 +93,11 @@ export const messages = {
         location: { name: locationName, country, state },
       } = subscription;
 
-      const timeToShow = convertDateToInputString(time, user.timezone);
+      const timeToShow = getOutputDateStringByPattern({
+        date: time,
+        timezone: user.timezone,
+        pattern: 'HH:mm',
+      });
 
       subscriptionMessage += `Name: ${name} \nTime: ${timeToShow} \nLocation: ${locationName}, ${country}`;
 
