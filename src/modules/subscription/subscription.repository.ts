@@ -17,7 +17,7 @@ export class SubscriptionRepository {
     return this.subscriptionRepository.save(subscription);
   }
 
-  public getAllSubscriptions(user: User): Promise<Subscription[]> {
+  public getAllSubscriptionsByUser(user: User): Promise<Subscription[]> {
     return this.subscriptionRepository.find({
       where: { user },
       relations: { location: true, user: true },
@@ -26,15 +26,16 @@ export class SubscriptionRepository {
 
   public getSubscriptionByName(
     subscriptionName: string,
+    chatId: number,
   ): Promise<Nullable<Subscription>> {
-    return this.subscriptionRepository.findOne({
-      where: {
-        name: subscriptionName,
-      },
-      relations: {
-        location: true,
-      },
-    });
+    return this.subscriptionRepository
+      .createQueryBuilder('subscription')
+      .innerJoin('subscription.user', 'user')
+      .where('subscription.name = :subscriptionName', {
+        subscriptionName,
+      })
+      .andWhere('user.chatId = :chatId', { chatId })
+      .getOne();
   }
 
   public deleteSubscription(subscription: Subscription): Promise<Subscription> {
