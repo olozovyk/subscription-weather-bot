@@ -5,7 +5,11 @@ import { Telegraf } from 'telegraf';
 import { HttpService } from '../../common/http/http.service';
 import { ConfigService } from '@nestjs/config';
 import { Subscription } from '../subscription/entities';
-import { IWeatherFromAPI, IWeatherItemFromAPI } from './types';
+import {
+  IForecastFromAPI,
+  IWeatherItemFromAPI,
+  IWeatherMappedItem,
+} from './types';
 import { getWindDirectionEmoji, roundNumber } from './utils';
 import {
   capitalizeString,
@@ -26,6 +30,7 @@ export class DeliveryWeatherService {
 
   private WEATHER_API_KEY = this.configService.getOrThrow('WEATHER_API_KEY');
   private WEATHER_API_URL = this.configService.getOrThrow('WEATHER_API_URL');
+  private FORECAST_API_URL = this.configService.getOrThrow('FORECAST_API_URL');
 
   public deliveryMessage(subscriptions: Subscription[]): void {
     subscriptions.forEach(async subscription => {
@@ -34,7 +39,7 @@ export class DeliveryWeatherService {
         user: { chatId },
       } = subscription;
 
-      const weather = await this.getWeather(latitude, longitude);
+      const weather = await this.getWeatherNew(latitude, longitude);
 
       if (!weather) {
         this.logger.error('Weather was not received');
@@ -53,28 +58,84 @@ export class DeliveryWeatherService {
     });
   }
 
-  private async getWeather(
+  private async getWeatherNew(
     latitude: number,
     longitude: number,
-  ): Promise<IWeatherFromAPI | void> {
-    const url =
+  ): Promise<IWeatherMappedItem[] | void> {
+    const weatherUrl =
       this.WEATHER_API_URL +
       `?appid=${this.WEATHER_API_KEY}` +
       `&lat=${latitude}` +
       `&lon=${longitude}` +
       '&units=metric' +
-      '&cnt=3';
+      '&lang=en';
 
-    return this.httpService.get<IWeatherFromAPI>(url);
+    const forecastUrl =
+      this.FORECAST_API_URL +
+      `?appid=${this.WEATHER_API_KEY}` +
+      `&lat=${latitude}` +
+      `&lon=${longitude}` +
+      '&units=metric' +
+      '&cnt=3' +
+      '&lang=en';
+
+    const weather = await this.httpService.get<IWeatherItemFromAPI>(weatherUrl);
+    const forecastFromApi = await this.httpService.get<IForecastFromAPI>(
+      forecastUrl,
+    );
+
+    if (!weather || !forecastFromApi) {
+      this.logger.error('Weather is not received from API');
+      return;
+    }
+
+    const weatherAndForecast: IWeatherMappedItem[] = [];
+
+    const currentWeather = this.mapWeatherItem(weather, true);
+
+    weatherAndForecast.push(currentWeather);
+
+    const forecast = forecastFromApi.list.slice(1);
+    forecast.map(item => {
+      const forecastItem = this.mapWeatherItem(item);
+      weatherAndForecast.push(forecastItem);
+    });
+
+    return weatherAndForecast;
+  }
+
+  private mapWeatherItem(
+    item: IWeatherItemFromAPI,
+    isCurrent?: boolean,
+  ): IWeatherMappedItem {
+    return {
+      current: !!isCurrent,
+      dt: item.dt,
+      temp: item.main.temp,
+      feels_like: item.main.feels_like,
+      pressure: item.main.pressure,
+      humidity: item.main.humidity,
+
+      weather: {
+        id: item.weather[0].id,
+        main: item.weather[0].main,
+        description: item.weather[0].description,
+      },
+
+      wind: {
+        speed: item.wind.speed,
+        deg: item.wind.deg,
+      },
+    };
   }
 
   private getWeatherString(
     subscription: Subscription,
-    weather: IWeatherFromAPI,
+    weather: IWeatherMappedItem[],
   ): string {
     let message = this.getWeatherTitleString(subscription);
 
-    weather.list.forEach(item => {
+    weather.forEach(item => {
       message += this.getWeatherItemString(item, subscription.user.timezone);
     });
 
@@ -100,25 +161,30 @@ export class DeliveryWeatherService {
   }
 
   private getWeatherItemString(
-    weatherItem: IWeatherItemFromAPI,
+    weatherItem: IWeatherMappedItem,
     timezone?: string,
   ): string {
     let message = '';
 
     const {
+      current,
       dt,
-      main: { temp, feels_like, pressure, humidity },
+      temp,
+      feels_like,
+      pressure,
+      humidity,
+      weather: { description },
       wind: { speed, deg },
     } = weatherItem;
-
-    const { description } = weatherItem.weather[0];
 
     const date = getOutputDateStringByPattern({
       date: new Date(dt * 1000),
       timezone,
       pattern: 'HH:mm',
     });
-    message += `\n\n✅ ${date}:\n`;
+
+    const nowOrDate = current ? 'Now' : date;
+    message += `\n\n✅ ${nowOrDate}:\n`;
 
     message += `\n🌡 ${roundNumber(temp)}°`;
     message += `, feels like ${roundNumber(feels_like)}°`;

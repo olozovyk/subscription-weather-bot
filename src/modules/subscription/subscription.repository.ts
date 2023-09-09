@@ -30,7 +30,7 @@ export class SubscriptionRepository {
   ): Promise<Nullable<Subscription>> {
     return this.subscriptionRepository
       .createQueryBuilder('subscription')
-      .innerJoin('subscription.user', 'user')
+      .innerJoinAndSelect('subscription.user', 'user')
       .where('subscription.name = :subscriptionName', {
         subscriptionName,
       })
