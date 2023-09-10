@@ -14,14 +14,18 @@ export class SubscriptionService {
     return this.subscriptionsRepository.saveSubscription(subscription);
   }
 
-  public getAllSubscriptions(user: User): Promise<Subscription[]> {
-    return this.subscriptionsRepository.getAllSubscriptions(user);
+  public getAllSubscriptionsByUser(user: User): Promise<Subscription[]> {
+    return this.subscriptionsRepository.getAllSubscriptionsByUser(user);
   }
 
   public getSubscriptionByName(
     subscriptionName: string,
+    chatId: number,
   ): Promise<Nullable<Subscription>> {
-    return this.subscriptionsRepository.getSubscriptionByName(subscriptionName);
+    return this.subscriptionsRepository.getSubscriptionByName(
+      subscriptionName,
+      chatId,
+    );
   }
 
   public deleteSubscription(subscription: Subscription): Promise<Subscription> {

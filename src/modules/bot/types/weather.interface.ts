@@ -20,6 +20,26 @@ export interface IWeatherItemFromAPI {
   };
 }
 
-export interface IWeatherFromAPI {
+export interface IForecastFromAPI {
   list: IWeatherItemFromAPI[];
+}
+
+export interface IWeatherMappedItem {
+  current?: boolean;
+  dt: number;
+  temp: number;
+  feels_like: number;
+  pressure: number;
+  humidity: number;
+
+  weather: {
+    id: number;
+    main: string;
+    description: string;
+  };
+
+  wind: {
+    speed: number;
+    deg: number;
+  };
 }

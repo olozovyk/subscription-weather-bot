@@ -36,9 +36,8 @@ export class SubscriptionNameScene extends BaseScene {
         return;
       }
 
-      const subscriptions = await this.subscriptionsService.getAllSubscriptions(
-        user,
-      );
+      const subscriptions =
+        await this.subscriptionsService.getAllSubscriptionsByUser(user);
       ctx.session.subscriptions = subscriptions;
 
       if (subscriptions.length >= 5) {

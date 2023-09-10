@@ -107,9 +107,8 @@ export class BotService {
         return;
       }
 
-      const subscriptions = await this.subscriptionsService.getAllSubscriptions(
-        user,
-      );
+      const subscriptions =
+        await this.subscriptionsService.getAllSubscriptionsByUser(user);
 
       if (!subscriptions.length) {
         await ctx.reply(messages.noSubscriptions, showMainKeyboard());
