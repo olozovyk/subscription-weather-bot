@@ -9,31 +9,47 @@ import { User } from '../../user/user.entity';
 export const messages = {
   makeChoice: 'Please make your choice',
   start:
-    'In this bot you can create a subscription to get the weather forecast in the time you want',
+    'Welcome to Weather Forecast Bot!' +
+    '\n\n' +
+    'You can create a subscription to receive fresh weather forecasts at your preferred time.' +
+    '\n\n' +
+    'Simply press the <b>New Subscription</b> button to get started. If you need more information, press the <b>Help</b> button or type /help command.',
   help:
-    'In this bot you can create subscriptions to receive the weather forecast at the time you want.\n' +
+    '✅  You can create up to 5 subscriptions.' +
+    '\n\n' +
+    '🌍  By default, subscriptions are created in the UTC time zone.' +
     '\n' +
-    'To create a subscription press the button "New subscription" and follow the instructions.\n' +
-    '\n' +
-    'By default the bot saves a time in the UTC format. To save a time in your timezone you should set a timezone by pressing the button “Set timezone”.\n' +
-    '\n' +
-    'You can create up to 5 subscriptions.',
+    'To change the time zone to your local one, navigate to the Set Timezone menu.' +
+    '\n\n' +
+    '🕐  You should use time in a 24-hour format.',
 
   noSubscriptions: `You don't have active subscriptions`,
 
   subscriptionsMaxOut: 'You can add no more than 5 subscriptions',
   askSubscriptionName:
-    'What name would you like to give to your new subscription?',
+    '📝 What name would you like to give to your new subscription?',
   nameExists:
-    'You already have a subscription with such a name. Please give an another name',
+    '❕ You already have a subscription with that name. Could you choose another name?',
 
-  askLocation: 'Please tell the location you want the weather for?',
-  locationNotFound: 'Such a location has not found. Please try another one',
+  askLocation: '🌍 Please tell the location for your new subscription.',
+  locationNotFound:
+    '❕ Such a location has not found. Could you choose another one?',
 
   getLocationsString(locations: ILocation[]) {
+    const emojiNumbers = {
+      1: '1️⃣',
+      2: '2️⃣',
+      3: '3️⃣',
+      4: '4️⃣',
+      5: '5️⃣',
+    };
+
     return locations
       .map((location: ILocation, idx: number) => {
-        let locationStr = `${idx + 1} ${location.name}, ${location.country}`;
+        const numberToShow =
+          emojiNumbers[(idx + 1) as keyof typeof emojiNumbers];
+
+        let locationStr = `${numberToShow} - ${location.name}, ${location.country}`;
 
         if (location.state) {
           locationStr += ` ${location.state}`;
@@ -45,28 +61,32 @@ export const messages = {
   },
 
   confirmLocation:
-    'Please choose your location by pressing the appropriate button',
+    'Please choose the location by pressing the appropriate button.',
 
   askTime:
-    "Please set a time for your subscription, e.g., 14:27 (24-hour format). If you don't send your timezone to the bot, you should use the UTC timezone",
+    '🕑 Please set a <b>time</b> for your subscription, e.g., 14:27 (24-hour format).' +
+    '\n\n' +
+    "If you haven't set a <b>timezone</b> before, it will use the UTC timezone by default. You can change your timezone by pressing the 'Set Timezone' button in the menu.",
   timeFormatIsNotValid:
-    'Please set a time for your subscription, e.g., 14:30 (24-hour format)',
+    '❕ Please set a time for your subscription, e.g., 14:30 (24-hour format)',
 
   getSubscriptionSummary(
     locationName: string,
     country: string,
     timeLocal: Date,
   ) {
-    return `You scheduled a subscription for ${locationName} ${country} to received the weather forecast at ${getTimeToShow(
+    return `👍 You scheduled a subscription for 🌍 ${locationName} ${country} to received the weather forecast at 🕑 ${getTimeToShow(
       timeLocal,
     )}`;
   },
 
   whichSubscriptionDelete:
-    'Which subscription would you like to delete? Specify a name for the subscription?',
+    'Which subscription would you like to delete? Specify 📝 a name for the subscription?' +
+    '\n\n' +
+    '👆 You could see all your active subscriptions by pressing the All Subscriptions button in the main menu.',
 
-  subscriptionDoesNotExist: 'A subscription with such a name is not existed',
-  successfulDeleting: 'The subscription is deleted',
+  subscriptionDoesNotExist: 'A subscription with such a name does not exist',
+  successfulDeleting: 'The subscription is deleted 🗑',
 
   askForTimezone: `Please tell your timezone in format 'Europe/Kyiv'`,
   timezoneIsNotValid:
@@ -76,9 +96,9 @@ export const messages = {
     return `Timezone ${timezone} was saved`;
   },
 
-  canceledCreating: 'You canceled creating of subscription',
-  canceledDeleting: 'You canceled deleting of subscription',
-  canceledSettingTimezone: 'You canceled setting a timezone',
+  canceledCreating: '✖️  You canceled the subscription creation',
+  canceledDeleting: '✖️  You canceled the subscription deletion',
+  canceledSettingTimezone: '✖️  You canceled the timezone setting',
 
   getAllSubscriptionsMessage(
     subscriptions: Subscription[],
@@ -99,7 +119,7 @@ export const messages = {
         pattern: 'HH:mm',
       });
 
-      subscriptionMessage += `Name: ${name} \nTime: ${timeToShow} \nLocation: ${locationName}, ${country}`;
+      subscriptionMessage += `✅ ${name} \n🕑 ${timeToShow} \n🌍 ${locationName}, ${country}`;
 
       if (state) {
         subscriptionMessage += ` ${state}`;
@@ -114,11 +134,11 @@ export const messages = {
   },
 
   mainKeyboard: [
-    'New subscription',
-    'All subscriptions',
-    'Delete subscription',
-    'Set timezone',
+    'New Subscription',
+    'All Subscriptions',
+    'Delete Subscription',
+    'Set Timezone',
     'Help',
   ],
-  cancelSceneKeyboard: ['❌ Cancel'],
+  cancelSceneKeyboard: ['✖️ Cancel'],
 };

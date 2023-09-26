@@ -28,7 +28,7 @@ export class TimeScene extends BaseScene {
 
   @SceneEnter()
   async enter(@Ctx() ctx: IMyContext) {
-    await ctx.reply(messages.askTime, showCancelSceneKeyboard());
+    await ctx.replyWithHTML(messages.askTime, showCancelSceneKeyboard());
   }
 
   @On('text')
