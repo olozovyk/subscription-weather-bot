@@ -17,6 +17,7 @@ import { messages } from './messages';
 import { logCaughtError } from '../../common/utils';
 import { SubscriptionService } from '../subscription/subscription.service';
 import { UserService } from '../user/user.service';
+import { ConfigService } from '@nestjs/config';
 
 @Update()
 export class BotService {
@@ -24,9 +25,11 @@ export class BotService {
     @InjectBot() private bot: Telegraf,
     private readonly subscriptionsService: SubscriptionService,
     private readonly usersService: UserService,
+    private readonly configService: ConfigService,
   ) {}
 
   private logger = new Logger(BotService.name);
+  private INTRO_IMAGE = this.configService.get('INTRO_IMAGE');
 
   @Start()
   async start(@Ctx() ctx: IMyContext) {
@@ -39,22 +42,22 @@ export class BotService {
     await this.helpHandler(ctx);
   }
 
-  @Hears('New subscription')
+  @Hears('New Subscription')
   async createSubscription(@Ctx() ctx: IMyContext) {
     await ctx.scene.enter('subscriptionName');
   }
 
-  @Hears('Set timezone')
+  @Hears('Set Timezone')
   async setTimezone(@Ctx() ctx: IMyContext) {
     await ctx.scene.enter('timezoneScene');
   }
 
-  @Hears('All subscriptions')
+  @Hears('All Subscriptions')
   async showSubscriptions(@Ctx() ctx: IMyContext) {
     await this.getSubscriptionsHandler(ctx);
   }
 
-  @Hears('Delete subscription')
+  @Hears('Delete Subscription')
   async deleteSubscription(@Ctx() ctx: IMyContext) {
     await ctx.scene.enter('deleteSubscriptionScene');
   }
@@ -89,7 +92,12 @@ export class BotService {
       }
 
       await this.setMenu();
-      await ctx.reply(messages.start, showMainKeyboard());
+
+      if (this.INTRO_IMAGE) {
+        await ctx.replyWithPhoto(this.INTRO_IMAGE);
+      }
+
+      await ctx.replyWithHTML(messages.start, showMainKeyboard());
     } catch (e) {
       logCaughtError(e, this.logger);
     }
@@ -127,6 +135,6 @@ export class BotService {
   }
 
   private async helpHandler(ctx: IMyContext) {
-    await ctx.reply(messages.help, showMainKeyboard());
+    await ctx.replyWithHTML(messages.help, showMainKeyboard());
   }
 }

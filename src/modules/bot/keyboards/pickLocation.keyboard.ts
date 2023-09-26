@@ -5,5 +5,5 @@ export const showPickLocationKeyboard = (locationsLength: number) => {
     .fill('')
     .map((_: string, idx: number) => String(idx + 1));
 
-  return Markup.keyboard([arr, ['❌ Cancel']]).resize();
+  return Markup.keyboard([arr, ['✖️ Cancel']]).resize();
 };

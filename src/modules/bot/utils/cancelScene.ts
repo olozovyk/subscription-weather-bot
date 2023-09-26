@@ -31,7 +31,7 @@ export const isSceneCanceled = async (
   text: string,
   action: 'create' | 'delete' | 'timezone',
 ): Promise<boolean | void> => {
-  if (text !== '❌ Cancel') return;
+  if (text !== '✖️ Cancel') return;
 
   const dict = {
     create: messages.canceledCreating,
