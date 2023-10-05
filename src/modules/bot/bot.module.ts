@@ -27,6 +27,12 @@ const sessions = new LocalSession({ database: 'sessions.json' });
       useFactory: (configService: ConfigService) => ({
         token: configService.getOrThrow('BOT_TOKEN'),
         middlewares: [sessions.middleware()],
+        launchOptions: {
+          webhook: {
+            domain: configService.getOrThrow('BOT_URL'),
+            hookPath: '/bot/update',
+          },
+        },
       }),
       inject: [ConfigService],
     }),
