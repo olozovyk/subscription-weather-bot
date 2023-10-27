@@ -33,7 +33,6 @@ export class BotService {
 
   @Start()
   async start(@Ctx() ctx: IMyContext) {
-    this.logger.log(JSON.stringify(await this.bot.telegram.getWebhookInfo()));
     await this.startHandler(ctx);
   }
 
