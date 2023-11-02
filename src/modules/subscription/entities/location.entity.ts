@@ -21,10 +21,10 @@ export class Location {
   @Column({ nullable: true })
   state: string;
 
-  @Column({ type: 'numeric' })
+  @Column({ type: 'double precision' })
   latitude: number;
 
-  @Column({ type: 'numeric' })
+  @Column({ type: 'double precision' })
   longitude: number;
 
   @OneToOne(() => Subscription, subscription => subscription.location, {

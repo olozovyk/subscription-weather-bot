@@ -1,73 +1,98 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# Subscription Weather Bot
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+<img alt="NestJS" height="70" src="https://drive.google.com/uc?export=download&id=1_rJ8EderaxLPKOsUBsMyZ7AC79-FHzPo" />&nbsp;&nbsp;
+<img alt="Telegram" src="https://drive.google.com/uc?export=download&id=1qzKrVf2ZZlHhvQUdDfLV3yoLZpqd9AwA" />&nbsp;&nbsp;
+<img alt="TypeORM" height="70" src="https://drive.google.com/uc?export=download&id=1aiNlnf9ZcVoEoDFAi3DwVnGINzOyuzWD" />&nbsp;&nbsp;
+<img alt="PostreSQL" height="70" src="https://drive.google.com/uc?export=download&id=1ZpAvyLxNyD5GVwVOyxpnEH9qTKx2ICJJ" />&nbsp;&nbsp;
+<img alt="Docker" height="70" src="https://drive.google.com/uc?export=download&id=1H_xnywHh-LsaGKcbPpA4ftJXUsYd_YP8" />&nbsp;&nbsp;
+<img alt="AWS EC2" height="70" src="https://drive.google.com/uc?export=download&id=1zAcogeDM9McUWaJitNp61ZF_swkKsuTt" />&nbsp;&nbsp;
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
-## Description
+The Telegram bot gives users the ability to create weather forecast
+subscriptions for any time.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+It interacts with external API [OpenWeather](https://openweathermap.org/api) to provide
+up-to-date weather information.
 
-## Installation
+The bot was developed using NestJS, with data storage managed by PostgreSQL
+through TypeORM. Task scheduling is implemented using a built-in feature of
+NestJS.
+
+You can try it out by passing the [link](https://t.me/subscription_weather_1_bot)
+to the bot.
+
+### The bot commands:
+
+- **/start** - for run the bot  
+- **/help** - provides instructions
+
+Most of your actions in the bot can be done using a keyboard. You can create 
+a subscription, delete a subscription, set your actual time zone, and see a 
+list of your subscriptions.
+
+###
+
+---
+
+###
+
+If you want to run the project locally, first, install npm dependencies using 
+the `npm install` command and set _environment variables_ in the .env file. See 
+the example in the .env.example file.
+
+### To run the project, use one of the following commands:
 
 ```bash
-$ npm install
-```
+$ npm start
 
-## Running the app
-
-```bash
-# development
-$ npm run start
-
-# watch mode
+# in development mode
 $ npm run start:dev
-
-# production mode
-$ npm run start:prod
 ```
 
-## Test
+### The bot consists of the following modules:
 
-```bash
-# unit tests
-$ npm run test
+- bot - bot - this module handles the interaction with the Telegram API through 
+the nestjs-telegraf npm package. It implements scenes for a more convenient and 
+smooth user experience and interaction.
+- user - the module is responsible for managing basic user information, storing
+  chatId, and time zone to the DB.
+- subscription - used for storing and managing subscriptions.
+- cron - this module periodically checks if there are any subscriptions in the 
+database for a given time to send it to users.
 
-# e2e tests
-$ npm run test:e2e
+### DB schema:
 
-# test coverage
-$ npm run test:cov
+User:
+
+```
+{
+	id: uuid,
+	chatId: number,
+	timezone?: string
+}
 ```
 
-## Support
+Subscription:
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+```
+{
+	id: uuid,
+	name: string,
+	time: Date,
+	userId: uuid (many-to-one)
+}
+```
 
-## Stay in touch
+Location:
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
+```
+{
+	id: uuid
+	name: string,
+	country: string,
+	state?: string,
+	latitude: number,
+	longitude: number,
+	subscriptionId: uuid (one-to-one)
+}
+```

@@ -17,6 +17,7 @@ import { DeleteSubscriptionScene } from './scenes/deleteSubscription';
 import { SubscriptionModule } from '../subscription/subscription.module';
 import { UserModule } from '../user/user.module';
 import { DeliveryWeatherService } from './deliveryWeather.service';
+import { getBotConfig } from './bot.config';
 
 const sessions = new LocalSession({ database: 'sessions.json' });
 
@@ -24,16 +25,7 @@ const sessions = new LocalSession({ database: 'sessions.json' });
   imports: [
     TelegrafModule.forRootAsync({
       imports: [ConfigModule, SubscriptionModule],
-      useFactory: (configService: ConfigService) => ({
-        token: configService.getOrThrow('BOT_TOKEN'),
-        middlewares: [sessions.middleware()],
-        launchOptions: {
-          webhook: {
-            domain: configService.getOrThrow('BOT_URL'),
-            hookPath: '/bot/update',
-          },
-        },
-      }),
+      useFactory: getBotConfig,
       inject: [ConfigService],
     }),
     HttpModule,

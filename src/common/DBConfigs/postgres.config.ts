@@ -14,5 +14,5 @@ export const postgresConfig: DataSourceOptions = {
   password: configService.getOrThrow('POSTGRES_PASSWORD'),
   database: configService.getOrThrow('POSTGRES_DB_NAME'),
   synchronize: true,
-  entities: ['*/**/*.entity.js'],
+  entities: ['dist/**/*.entity.js'],
 };
