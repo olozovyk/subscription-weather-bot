@@ -1,11 +1,11 @@
 # Subscription Weather Bot
 
-<img alt="NestJS" height="70" src="https://drive.google.com/uc?export=download&id=1_rJ8EderaxLPKOsUBsMyZ7AC79-FHzPo" />&nbsp;&nbsp;
-<img alt="Telegram" src="https://drive.google.com/uc?export=download&id=1qzKrVf2ZZlHhvQUdDfLV3yoLZpqd9AwA" />&nbsp;&nbsp;
-<img alt="TypeORM" height="70" src="https://drive.google.com/uc?export=download&id=1aiNlnf9ZcVoEoDFAi3DwVnGINzOyuzWD" />&nbsp;&nbsp;
-<img alt="PostreSQL" height="70" src="https://drive.google.com/uc?export=download&id=1ZpAvyLxNyD5GVwVOyxpnEH9qTKx2ICJJ" />&nbsp;&nbsp;
-<img alt="Docker" height="70" src="https://drive.google.com/uc?export=download&id=1H_xnywHh-LsaGKcbPpA4ftJXUsYd_YP8" />&nbsp;&nbsp;
-<img alt="AWS EC2" height="70" src="https://drive.google.com/uc?export=download&id=1zAcogeDM9McUWaJitNp61ZF_swkKsuTt" />&nbsp;&nbsp;
+<img alt="NestJS" height="70" src="https://github-tools-icons.s3.eu-central-1.amazonaws.com/nestjs_h70.png" />&nbsp;&nbsp;
+<img alt="Telegram" src="https://github-tools-icons.s3.eu-central-1.amazonaws.com/telegram_h70.png" />&nbsp;&nbsp;
+<img alt="TypeORM" height="70" src="https://github-tools-icons.s3.eu-central-1.amazonaws.com/typeorm_h70.png" />&nbsp;&nbsp;
+<img alt="PostreSQL" height="70" src="https://github-tools-icons.s3.eu-central-1.amazonaws.com/postgres_h70.png" />&nbsp;&nbsp;
+<img alt="Docker" height="70" src="https://github-tools-icons.s3.eu-central-1.amazonaws.com/docker_h70.png" />&nbsp;&nbsp;
+<img alt="AWS EC2" height="70" src="https://github-tools-icons.s3.eu-central-1.amazonaws.com/ec2_h70.png" />&nbsp;&nbsp;
 
 
 The Telegram bot gives users the ability to create weather forecast
@@ -79,7 +79,7 @@ Subscription:
 	id: uuid,
 	name: string,
 	time: Date,
-	userId: uuid (many-to-one)
+	userId: User (many-to-one)
 }
 ```
 
@@ -93,6 +93,6 @@ Location:
 	state?: string,
 	latitude: number,
 	longitude: number,
-	subscriptionId: uuid (one-to-one)
+	subscriptionId: Subscription (one-to-one)
 }
 ```
